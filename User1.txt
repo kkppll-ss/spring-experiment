@@ -1,0 +1,6 @@
+User_name: kkk
+User_age: 21
+User_gender: m
+Times/Total, Timestamp, Recognition Load, Handness, Force Profile, Repeated Times, User Choice 
+1/288, 2018-02-10 17:50:41, True, False, 5, 8, -1
+2/288, 2018-02-10 17:50:55, True, False, 5, 5, 1
