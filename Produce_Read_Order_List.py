@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 import random
-import ast
+# import ast
 
 # Cognitive Load(2) * handness(2) * force profile(8) * 9 (repeated times)
 
@@ -65,11 +65,9 @@ class Produce_Read_Order_List:
     # Output File order list file: User_5_order_list.txt
     def start_up(self, user_num):
         self.current_user_num = user_num
-        f = open("User_"+str(self.current_user_num) + "_order_list.txt", "w")
-
-        header = ["Condition", "Force_Profile", "Repeated_Times"]
-        f.write(str(header))
-        f.write(str("\n"))
+        f = open("Order_List/User_"+str(self.current_user_num) + "_order_list.txt", "w")
+        header = "Recognition_Load,Handness,Force_Profile,Repeated_Times\n"
+        f.write(header)
 
         pairs = self.pairs
         pairs_list = [pairs[:], pairs[:], pairs[:], pairs[:]]
@@ -79,34 +77,23 @@ class Produce_Read_Order_List:
         for c, i in zip(Display_condition_order, pairs_list):
             while len(i) != 0:
                 index = random.randrange(len(i))     # randomize the order of (force profile, repeated times) pairs
-                f.write(str([c, i[index][0], i[index][1]]) + '\n')
+                f.write(str(self.condition_lookup_table[c][0]) + "," + str(self.condition_lookup_table[c][1]) + "," + i[index][0] + "," +i[index][1])
+                f.write("\n")
                 i.pop(index)
 
         print "User_Order_List Start Up Complete"
 
-    # Parse list ['A', 4, 2] => [0, 1, 4, 2] using the condition lookup table
-    def parse_command(self, command):
-        Cmd = []
-        for i in range(len(command)):
-            if i == 0:
-                Cmd.append(self.condition_lookup_table[command[i]][0])
-                Cmd.append(self.condition_lookup_table[command[i]][1])
-            else:
-                Cmd.append(command[i])
-        return Cmd
-
     # Store the parsed commands in internal Self.Commands variable
     def read_command(self):
         counter = 0
-        filename = "User_" + str(self.current_user_num) + "_order_list.txt"
+        filename = "Order_List/User_" + str(self.current_user_num) + "_order_list.txt"
         with open(filename) as f:
             for line in f:
                 if counter != 0 and len(line) != 0:
-                    temp = ast.literal_eval(line)
-                    print temp
-                    self.Commands.append(self.parse_command(temp))
+                    self.Commands.append(line[:-1].split(','))
                 else:
                     counter += 1
+        print "Commands stored in internal list"
 
     # Read the commands from self.Commands line by line
     def read_command_by_line(self):
@@ -115,14 +102,16 @@ class Produce_Read_Order_List:
         return self.Commands[self.read_line_counter - 1]
 
 
-cmd = Produce_Read_Order_List()
-cmd.make_pairs()
-cmd.start_up(16)
-cmd.read_command()
+# Useage format
+# cmd = Produce_Read_Order_List()
+# cmd.make_pairs()
+# cmd.start_up(16)
+# cmd.read_command()
 
+# print cmd.Commands
 # print "******************************"
-# print cmd.read_Command_by_line()
-# print cmd.read_Command_by_line()
+# print cmd.read_command_by_line()
+# print cmd.read_command_by_line()
 # print cmd.read_Command_by_line()
 # print "******************************"
 #

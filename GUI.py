@@ -1,71 +1,86 @@
 # -*- coding: UTF-8 -*-
 
+import time
+import Image
 import Tkinter
+import ImageTk
 import tkMessageBox
 import Produce_Read_Order_List
+
 from Tkinter import *
-import ImageTk
-import Image
-import datetime
-import time
+from Spring import Spring
 
 
 class Experiment_Session:
 
     def __init__(self):
-        root = Tkinter.Tk()
-        root.title("Haptic Experiment")
-        self.center_window(root, 600, 600)
-        root.maxsize(800, 600)
-        root.minsize(300, 240)
+        self.root = Tkinter.Tk()
+        self.root.title("Haptic Experiment")
+        self.center_window(self.root, 600, 600)
+        self.root.maxsize(800, 600)
+        self.root.minsize(300, 240)
+
+        # Bind the Space Key press to continue
+        self.root.bind("<KeyPress>", self.SpaceContinue)
+        self.root.focus_set()
+        self.root.bind('<Return>', self.EnterPress)
+        self.spring = Spring()
+
         self.cmd = Produce_Read_Order_List.Produce_Read_Order_List()
         self. cmd.make_pairs()
         self.User_feel_FP = -1               # record the user's actual choice of haptic feeling
+        self.User_enter_feel = ""
         self.global_times_counter = 0        # record the user's repeated times
-        self.FP_status_0 = IntVar()
-        self.FP_status_1 = IntVar()
-        self.FP_status_2 = IntVar()
-        self.FP_status_3 = IntVar()
-        self.FP_status_4 = IntVar()
-        self.FP_status_5 = IntVar()
-        self.FP_status_6 = IntVar()
-        self.FP_status_7 = IntVar()
+        self.start = 0
+        self.end = 0
+        self.deltatime = 0
 
         self.varNum = Tkinter.StringVar(value='')
         self.varName = Tkinter.StringVar(value='')
         self.varGender = Tkinter.StringVar(value='')
         self.varAge = Tkinter.StringVar(value='')
 
-        self.labelNum = Tkinter.Label(root, text='User Num:')
+        self.labelNum = Tkinter.Label(self.root, text='User Num:')
         self.labelNum.place(x=10, y=5, width=80, height=20)
-        self.entryNum = Tkinter.Entry(root, width=80, textvariable=self.varNum)
+        self.entryNum = Tkinter.Entry(self.root, width=80, textvariable=self.varNum)
         self.entryNum.place(x=100, y=5, width=80, height=20)
 
-        self.LabelName = Tkinter.Label(root, text='Name:')
+        self.LabelName = Tkinter.Label(self.root, text='Name:')
         self.LabelName.place(x=10, y=30, width=80, height=20)
-        self.entryName = Tkinter.Entry(root, width=80, textvariable=self.varName)
+        self.entryName = Tkinter.Entry(self.root, width=80, textvariable=self.varName)
         self.entryName.place(x=100, y=30, width=80, height=20)
 
-        self.LabelGender = Tkinter.Label(root, text='Gender:')
+        self.LabelGender = Tkinter.Label(self.root, text='Gender:')
         self.LabelGender.place(x=170, y=5, width=80, height=20)
-        self.entryGender = Tkinter.Entry(root, width=80, textvariable=self.varGender)
+        self.entryGender = Tkinter.Entry(self.root, width=80, textvariable=self.varGender)
         self.entryGender.place(x=270, y=5, width=80, height=20)
 
-        self.LabelAge = Tkinter.Label(root, text='Age:')
+        self.LabelAge = Tkinter.Label(self.root, text='Age:')
         self.LabelAge.place(x=170, y=30, width=80, height=20)
-        self.entryAge = Tkinter.Entry(root, width=80, textvariable=self.varAge)
+        self.entryAge = Tkinter.Entry(self.root, width=80, textvariable=self.varAge)
         self.entryAge.place(x=270, y=30, width=80, height=20)
+
+        self.LabelUserfeeling = Tkinter.Label(self.root, text='Actual Feel:')
+        self.LabelUserfeeling.place(x=10, y=90, width=80, height=20)
+
+        self.entryuser_actual_feeling = Tkinter.Entry(self.root, width=80, textvariable=self.User_enter_feel)
+        # self.entryuser_actual_feeling.bind('<Key>', self.printkey)
+        self.entryuser_actual_feeling.place(x=100, y=90, width=80, height=20)
 
         self.CurrentTrial = StringVar()
         self.TrialInfo = StringVar()
 
-        Next = Tkinter.Button(root, text='Next Trial', command=self.NextTrial)
-        Next.place(x=270, y=60, width=80, height=20)
+        self.show_info = ""  # Information showed on the panel
+        self.write_info = ""  # Information written to the records file
 
-        Info = Label(root, textvariable=self.TrialInfo)
+        self.user_name = ""
+        self.user_age = ""
+        self.user_gender = ""
+
+        Info = Label(self.root, textvariable=self.TrialInfo)
         Info.place(x=350, y=0, width=300, height=150)
 
-        Next_Personal = Tkinter.Button(root, text='Next Person', command=self.NextPersonal)
+        Next_Personal = Tkinter.Button(self.root, text='Next Person', command=self.NextPersonal)
         Next_Personal.place(x=270, y=90, width=80, height=20)
 
         img_1 = Image.open('img/F01.jpg')
@@ -101,59 +116,76 @@ class Experiment_Session:
         img_8 = ImageTk.PhotoImage(img_8)
 
         # CheckBox for Force Profile
-        self.FP1 = Checkbutton(root, text="Force Profile 1", variable=self.FP_status_0, command=self.change)
+        self.FP1 = Label(self.root, text="Force Profile 1")
         self.FP1.place(x=20, y=120)
-        Label(root, text="abc", image=img_1).place(x=20, y=140)
+        Label(self.root, text="abc", image=img_1).place(x=20, y=140)
 
-        self.FP2 = Checkbutton(root, text="Force Profile 2", variable=self.FP_status_1, command=self.change)
+        self.FP2 = Label(self.root, text="Force Profile 2")
         self.FP2.place(x=170, y=120)
-        Label(root, text="abc", image=img_2).place(x=170, y=140)
+        Label(self.root, text="abc", image=img_2).place(x=170, y=140)
 
-        self.FP3 = Checkbutton(root, text="Force Profile 3", variable=self.FP_status_2, command=self.change)
+        self.FP3 = Label(self.root, text="Force Profile 3")
         self.FP3.place(x=320, y=120)
-        Label(root, text="abc", image=img_3).place(x=320, y=140)
+        Label(self.root, text="abc", image=img_3).place(x=320, y=140)
 
-        self.FP4 = Checkbutton(root, text="Force Profile 4", variable=self.FP_status_3, command=self.change)
+        self.FP4 = Label(self.root, text="Force Profile 4")
         self.FP4.place(x=470, y=120)
-        Label(root, text="abc", image=img_4).place(x=470, y=140)
+        Label(self.root, text="abc", image=img_4).place(x=470, y=140)
 
-        self.FP5 = Checkbutton(root, text="Force Profile 5", variable=self.FP_status_4, command=self.change)
-        self.FP5.place(x=20, y=280)
-        Label(root, text="abc", image=img_5).place(x=20, y=300)
+        self.FP5 = Label(self.root, text="Force Profile 5")
+        self.FP5.place(x=20, y=300)
+        Label(self.root, text="abc", image=img_5).place(x=20, y=320)
 
-        self.FP6 = Checkbutton(root, text="Force Profile 6", variable=self.FP_status_5, command=self.change)
-        self.FP6.place(x=170, y=280)
-        Label(root, text="abc", image=img_6).place(x=170, y=300)
+        self.FP6 = Label(self.root, text="Force Profile 6")
+        self.FP6.place(x=170, y=300)
+        Label(self.root, text="abc", image=img_6).place(x=170, y=320)
 
-        self.FP7 = Checkbutton(root, text="Force Profile 7", variable=self.FP_status_6, command=self.change)
-        self.FP7.place(x=320, y=280)
-        Label(root, text="abc", image=img_7).place(x=320, y=300)
+        self.FP7 = Label(self.root, text="Force Profile 7")
+        self.FP7.place(x=320, y=300)
+        Label(self.root, text="abc", image=img_7).place(x=320, y=320)
 
-        self.FP8 = Checkbutton(root, text="Force Profile 8", variable=self.FP_status_7, command=self.change)
-        self.FP8.place(x=470, y=280)
-        Label(root, text="abc", image=img_8).place(x=470, y=300)
+        self.FP8 = Label(self.root, text="Force Profile 8")
+        self.FP8.place(x=470, y=300)
+        Label(self.root, text="abc", image=img_8).place(x=470, y=320)
 
-        self.buttonOk = Tkinter.Button(root, text='Confirm', command=self.login)
+        self.buttonOk = Tkinter.Button(self.root, text='Confirm', command=self.login)
         self.buttonOk.place(x=20, y=60, width=60, height=20)
-        self.buttonCancel = Tkinter.Button(root, text='Cancel', command=self.cancel)
+        self.buttonCancel = Tkinter.Button(self.root, text='Cancel', command=self.cancel)
         self.buttonCancel.place(x=150, y=60, width=60, height=20)
 
         self.outputfile = None
 
-        root.mainloop()
+        self.root.mainloop()
 
-    # Enter the User Number to begin the first trial
+    # Enter the user's information before trial
     def login(self):
         user_num = self.entryNum.get()
+
+        if user_num == "":
+            tkMessageBox.showinfo(title='Warning', message='Please complete number')
+            return
+
         if user_num.isdigit() and 0 < int(user_num) < 17:
 
-            self.cmd.start_up(int(user_num))     # Produce commands by user number
-            self.cmd.read_command()  # Read commands => commands
-            tkMessageBox.showinfo(title='Info', message='Welcome, Begin Trials')
+            self.user_name = self.entryName.get()
+            self.user_age = self.entryAge.get()
+            self.user_gender = self.entryGender.get()
 
-            user_name = self.entryName.get()
-            user_age = self.entryAge.get()
-            user_gender = self.entryGender.get()
+            if self.user_name == "":
+                tkMessageBox.showinfo(title='Warning', message='Please complete name')
+                return
+
+            if self.user_age == "":
+                tkMessageBox.showinfo(title='Warning', message='Please complete age')
+                return
+
+            if self.user_gender == "":
+                tkMessageBox.showinfo(title='Warning', message='Please complete gender')
+                return
+
+            self.cmd.start_up(int(user_num))     # Produce commands by user number
+            self.cmd.read_command()              # Read commands => commands
+            tkMessageBox.showinfo(title='Info', message='Welcome, Begin Trials')
 
             self.entryNum.config(state="disabled")
             self.entryName.config(state="disabled")
@@ -161,14 +193,11 @@ class Experiment_Session:
             self.entryGender.config(state="disabled")
 
             # write the head information to the first 4 line in the file
-            self.outputfile = open("User_"+str(user_num)+"_record.txt", "w")
-            self.outputfile.write("User_name: " + user_name + "\n")
-            self.outputfile.write("User_age: " + user_age + "\n")
-            self.outputfile.write("User_gender: " + user_gender + "\n")
-            self.outputfile.write("Times/Total, Timestamp, Recognition Load, Handness, Force Profile, Repeated Times, User Choice \n")
+            self.outputfile = open("Records/User_"+str(user_num)+"_record.txt", "w")
+            self.outputfile.write("User_name, User_age, User_gender, Times, Recognition Load, Handness, Force Profile, Repeated Times, User Choice, Duration Time \n")
             self.outputfile.close()
             # Re-open the output file again for later record useage
-            self.outputfile = open("User_" + str(user_num)+"_record.txt", "a")
+            self.outputfile = open("Records/User_"+str(user_num)+"_record.txt", "a")
         else:
             tkMessageBox.showinfo('Please enter an valid number[0-16]', message='Error')
 
@@ -188,107 +217,90 @@ class Experiment_Session:
         self.entryAge.config(state="normal")
         self.entryGender.config(state="normal")
 
-    def NextTrial(self):
-        if self.global_times_counter == 0:
-            tkMessageBox.showinfo(title='Notice', message='Let\'s begin the first trial')
-            self.global_times_counter += 1
-        else:
-            tkMessageBox.showinfo(title='Notice', message='Now proceed to next trial')
-            currentTrial = self.cmd.read_command_by_line()
-            print currentTrial
-
-            show_info = ""   # Information showed on the panel
-            write_info = ""  # Information written to the records file
-
-            # Current/Total times
-            show_info += "Total Times: " + str(self.global_times_counter) + "/288 \n"
-            write_info += str(self.global_times_counter) + "/288, "
-
-            # Write the timestamp
-            write_info += datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')+", "
-
-            for i in range(len(currentTrial)):
-                if i == 0:
-                    if currentTrial[i] == 1:
-                        show_info += "Recognition Load: True\n"
-                        write_info += "True, "
-                    else:
-                        show_info += "Recognition Load: False\n"
-                        write_info += "False, "
-                if i == 1:
-                    if currentTrial[i] == 1:
-                        show_info += "Handness: True\n"
-                        write_info += "True, "
-                    else:
-                        show_info += "Handness: False\n"
-                        write_info += "False, "
-                if i == 2:
-                    show_info += "Force_Profile: " + currentTrial[i]+"\n"
-                    write_info += currentTrial[i]+", "
-                if i == 3:
-                    show_info += "Repeated_Times: " + currentTrial[i]+"\n"
-                    write_info += currentTrial[i] + ", "
-
-            # if self.User_feel_FP == -1:
-                
-            write_info += str(self.User_feel_FP) + "\n"
-            # self.outputfile = open("User" + str(int(self.entryNum.get()) - 1) + ".txt", "a")
-            self.outputfile.write(write_info)
-            self.TrialInfo.set(show_info)
-            self.FP_status_0.set(0)
-            self.FP_status_1.set(0)
-            self.FP_status_2.set(0)
-            self.FP_status_3.set(0)
-            self.FP_status_4.set(0)
-            self.FP_status_5.set(0)
-            self.FP_status_6.set(0)
-            self.FP_status_7.set(0)
-
-            self.global_times_counter += 1
-            # print str(global_times_counter) + "/288"
-
     def change(self):
-
-        if self.FP_status_0.get() == 1:   # if clicked
-            self.User_feel_FP = 0
-        # elif FP_status_0.get() == 0:
-        #     User_feel_FP = -1
-
-        if self.FP_status_1.get() == 1:
-            self.User_feel_FP = 1
-        # elif FP_status_1.get() == 0 and User_feel_FP == -1:
-        #     User_feel_FP = -1
-
-        if self.FP_status_2.get() == 1:
-            self.User_feel_FP = 2
-        # elif FP_status_1.get() == 0:
-        #     User_feel_FP = -1
-
-        if self.FP_status_3.get() == 1:
-            self.User_feel_FP = 3
-        # elif FP_status_3.get() == 0:
-        #     User_feel_FP = 3
-
-        if self.FP_status_4.get() == 1:
-            self.User_feel_FP = 4
-
-        if self.FP_status_5.get() == 1:
-            self.User_feel_FP = 5
-        # elif FP_status_5.get() == 0:
-        #     User_feel_FP = 5
-
-        if self.FP_status_6.get() == 1:
-            self.User_feel_FP = 6
-        # elif FP_status_6.get() == 0:
-        #     User_feel_FP = 6
-
-        if self.FP_status_7.get() == 1:
-            self.User_feel_FP = 7
-        # elif FP_status_7.get() == 0:
-        #     User_feel_FP = 7
-
         if self.User_feel_FP != -1:
-            tkMessageBox.showinfo(title='Info', message='User_feel_FP' + str(self.User_feel_FP+1))
+            tkMessageBox.showinfo(title='Info', message='User_feel_FP' + str(self.User_feel_FP))
 
+    def printkey(self, event):
+        print('You Entered: ' + event.char)
+        # if event.char.:
+        #     self.User_feel_FP = int(event.char)
 
-Experiment_Session()
+    def EnterPress(self, event=None):
+        if self.entryuser_actual_feeling.get() == "":
+            tkMessageBox.showinfo('Warning', message='Please enter your actual feel before proceed')
+        else:
+            self.User_feel_FP = int(self.entryuser_actual_feeling.get())
+
+            if self.User_feel_FP == -1:
+                tkMessageBox.showinfo(title='Notice', message='Please have a choice')
+                return
+
+            self.write_info += str(self.User_feel_FP) + "\n"
+            self.outputfile.write(self.write_info)
+            tkMessageBox.showinfo(title='Notice', message='Successfully Entered')
+            self.entryuser_actual_feeling.delete(0, 'end')
+
+            self.show_info = ""
+            self.write_info = ""
+            self.User_feel_FP = -1
+
+    def SpaceContinue(self, event):
+        if event.keysym == "space":
+            print "Space Entered"
+
+            if self.global_times_counter % 2 == 0:
+                self.start = int(round(time.time() * 1000))
+
+                # tkMessageBox.showinfo(title='Notice', message='Let\'s begin the trial')
+                currentTrial = self.cmd.read_command_by_line()
+                print currentTrial
+
+                # Current/Total times
+                self.write_info += self.user_name +","+ self.user_age +"," +self.user_gender+","
+
+                current_time = (self.global_times_counter + 1)/2 + 1
+                self.show_info += "Total Times: " + str(current_time) + "/288 \n"
+                self.write_info += str(current_time) + ","
+                currFP = ""
+                for i in range(len(currentTrial)):
+                    if i == 0:
+                        if currentTrial[i] == 1:
+                            self.show_info += "Recognition Load: True\n"
+                            self.write_info += "1,"
+                        else:
+                            self.show_info += "Recognition Load: False\n"
+                            self.write_info += "0,"
+                    if i == 1:
+                        if currentTrial[i] == 1:
+                            self.show_info += "Handness: True\n"
+                            self.write_info += "1,"
+                        else:
+                            self.show_info += "Handness: False\n"
+                            self.write_info += "0,"
+                    if i == 2:
+                        self.show_info += "Force_Profile: " + currentTrial[i] + "\n"
+                        self.write_info += currentTrial[i] + ","
+                        currFP = currentTrial[i]
+                    if i == 3:
+                        self.show_info += "Repeated_Times: " + currentTrial[i] + "\n"
+                        self.write_info += currentTrial[i] + ","
+
+                self.TrialInfo.set(self.show_info)
+                self.global_times_counter += 1
+
+                self.spring = Spring()
+                self.spring.set_profile(currFP)
+                self.spring.run()
+
+            else:  # self.global_times_counter % 2 == 1 Stop the current trial
+                self.spring.terminate()
+                self.end = int(round(time.time() * 1000))
+                self.deltatime = self.end - self.start
+                # Write the timestamp
+                self.write_info += str(self.deltatime)+","
+                self.entryuser_actual_feeling.delete(0, 'end')
+                self.global_times_counter += 1
+
+if "__main__":
+    Experiment_Session()
