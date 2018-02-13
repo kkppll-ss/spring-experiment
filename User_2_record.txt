@@ -1,8 +1,0 @@
-User_name: wyk
-User_age: 21
-User_gender: male
-Times/Total, Timestamp, Recognition Load, Handness, Force Profile, Repeated Times, User Choice 
-1/288, 2018-02-11 11:14:07, True, False, FP03, RT04, -1
-2/288, 2018-02-11 11:14:31, True, False, FP08, RT05, 1
-3/288, 2018-02-11 11:14:40, True, False, FP08, RT07, 2
-4/288, 2018-02-11 11:15:12, True, False, FP04, RT03, 1
