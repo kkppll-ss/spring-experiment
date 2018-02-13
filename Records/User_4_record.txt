@@ -1,0 +1,7 @@
+User_name,User_age,User_gender,Times,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,ask_last_num,user_RL_Choice 
+wyk, 16,male,1,1,1,FP01,RT02,1,1,1
+wyk, 16,male,2,1,1,FP03,RT03,2,3,2
+wyk,16,male,3,1,1,FP08,RT02,3,2,3
+wyk,16,male,4,1,1,FP01,RT02,4,2,4
+wyk,16,male,5,1,1,FP01,RT04,5,3,5
+wyk,16,male,6,1,1,FP03,RT07,6,3,6
