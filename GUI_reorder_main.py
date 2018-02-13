@@ -9,11 +9,13 @@ import ImageTk
 import Image
 import random
 # from Spring import Spring
+from SpringTest import Spring
 
 
 class Experiment_Session:
 
     def __init__(self):
+        # Set the basic params of windows
         self.root = Tkinter.Tk()
         self.root.title("Haptic Experiment")
         w = self.root.winfo_screenwidth()
@@ -32,27 +34,27 @@ class Experiment_Session:
 
         self.User_feel_FP = -1         # record the user's actual choice of haptic feeling
         self.global_times_counter = 0  # record the user's repeated times
-        self.start = 0
-        self.end = 0
-        self.deltatime = 0
-        self.startTrialNum = 0
-        self.outputfile = None
-        self.currentTrial = None
-        self.SpacePressTime = 0
-        self.EnterPressTime = 0
-        self.user_choice = -1
-        self.ask_last_num = 0
-        self.write_info = ""
-        self.show_info = ""
+        self.start = 0             # Start timestamp for haptic sensing
+        self.end = 0               # End timestamp for haptic sensing
+        self.deltatime = 0         # The time duration for haptic sensing
+        self.startTrialNum = 0     # Start number specified for program crash
+        self.outputfile = None     # Output file for trial recording
+        self.currentTrial = None   # Current trial information
+        self.SpacePressTime = 0    # Times of press [Space]
+        self.EnterPressTime = 0    # Times of press [Enter]
+        self.user_choice = -1      # User choice of last i'th electronic element
+        self.ask_last_num = 0      # the last i'th elements hear of under the Recongnition load
+        self.write_info = ""       # Information written to output file
+        self.show_info = ""        # Information showed on the panel
 
-        self.TrialInfo = Tkinter.StringVar(value='')
-        self.Answer = Tkinter.StringVar(value='')
-        self.Question_text = Tkinter.StringVar(value='')
+        self.TrialInfo = Tkinter.StringVar(value='')     # Trial information
+        self.Answer = Tkinter.StringVar(value='')        # User answer
+        self.Question_text = Tkinter.StringVar(value='') # Text of Question
 
         # Bind the Space Key press to continue
-        self.root.bind("<KeyPress>", self.SpaceContinue)
+        self.root.bind("<KeyPress>", self.SpaceContinue)  # Bind the [Space] press and its function
         self.root.focus_set()
-        self.root.bind('<Return>', self.EnterPress)
+        self.root.bind('<Return>', self.EnterPress)       # Bind the [Enter] Key press
         # self.spring = Spring()
 
         self.varNum = Tkinter.StringVar(value='')
@@ -60,6 +62,7 @@ class Experiment_Session:
         self.varGender = Tkinter.StringVar(value='')
         self.varAge = Tkinter.StringVar(value='')
 
+        # Top level Panel for user information enter, show at program boot, hide when information entered and confirmed
         top_entry_y = h/80
         self.labelNum = Tkinter.Label(self.root, text='User Num:')
         self.labelNum.place(x=w/80, y=top_entry_y, width=w/12, height=h/20)
@@ -105,7 +108,7 @@ class Experiment_Session:
         self.Info.config(font=("Courier", 12, "bold"))
         # self.Info.place_forget()
 
-        # Set up and place the images
+        # Set up and place the images at the second level
         img_1 = Image.open('img/F01.jpg')
         img_1 = img_1.resize((w / 6, h / 6), Image.ANTIALIAS)
         img_1 = ImageTk.PhotoImage(img_1)
@@ -143,10 +146,10 @@ class Experiment_Session:
         col_x_3 = 12 * w / 80 + 2 * w / 6
         col_x_4 = 18 * w / 80 + 3 * w / 6
 
-        label_level_1_y = top_entry_y + 2*h/20
-        label_level_2_y = top_entry_y + 4 * h / 20 + h/6
+        label_level_1_y = top_entry_y + 2 * h/20
+        label_level_2_y = top_entry_y + 4 * h / 20 + h / 6
 
-        img_level_1_y = top_entry_y + 3*h/20
+        img_level_1_y = top_entry_y + 3 * h/20
         img_level_2_y = top_entry_y + 5 * h / 20 + h/6
 
         self.FP1 = Label(self.root, text="Force Profile 1", fg='blue')
@@ -218,13 +221,12 @@ class Experiment_Session:
         self.buttonOk.place_forget()
         self.buttonCancel.place_forget()
 
+        # Show the trial information after confirmation
         self.Info_Header.place(x=self.width / 80, y=self.height / 80, width=3 * self.width / 4, height=self.height / 25)
         self.Info_Header.config(bg="red")
-
         self.Info.place(x=self.width/80, y=self.height/80 + self.height/20, width=3 * self.width / 4, height=self.height/25)
 
         user_num = self.entryNum.get()
-
         if user_num == "":
             tkMessageBox.showinfo(title='Warning', message='Please complete number')
             return
@@ -244,17 +246,16 @@ class Experiment_Session:
             if self.user_gender == "":
                 tkMessageBox.showinfo(title='Warning', message='Please complete gender')
                 return
-
             if self.entryStartFromTrial.get() != "":
                 self.startTrialNum = int(self.entryStartFromTrial.get())
 
-            # check the existance of program crash
+            # check the existence of program crash
             if self.startTrialNum != 0:
                 existFilename = "Order_List/User_" + str(user_num) + "_order_list.txt"
-                self.cmd.read_command(existFilename)               # Read commands => commands
+                self.cmd.read_command(existFilename)            # Read commands => commands in existence file
             else:
                 self.cmd.start_up(int(user_num))  # Produce commands by user number
-                self.cmd.read_command()  # Read commands => commands
+                self.cmd.read_command()           # Read commands => commands
                 # write the head information to the first line in the file
                 self.outputfile = open("Records/User_" + str(user_num) + "_record.txt", "w")
                 self.outputfile.write(
@@ -272,9 +273,10 @@ class Experiment_Session:
         self.varGender.set('')
         self.varName.set('')
 
+    # Start and End a haptic trial by [Space] keypress
     def SpaceContinue(self, event):
         if event.keysym == "space":
-
+            # Press [Enter] for 1,3,5,7,9
             if self.EnterPressTime % 2 != 1:
                 tkMessageBox.showinfo('Warning', message='Press Enter before proceed')
                 return
@@ -283,19 +285,20 @@ class Experiment_Session:
             if self.SpacePressTime % 2 == 0:
                 self.start = int(round(time.time() * 1000))
                 self.Question_text.set("Haptic TEST START")
-                self.SpacePressTime += 1
                 # self.spring = Spring()
-                # self.spring.set_profile(currFP)
-                # self.spring.run()
+                # # self.spring.set_profile(currFP)
+                # self.spring.start()
             else:
                 # self.spring.terminate()
                 self.deltatime = int(round(time.time() * 1000)) - self.start
                 self.Question_text.set("Haptic TEST END")
                 self.Question.after(1000, lambda: self.Question_text.set("Please select a haptic feeling you sensed"))
-                self.SpacePressTime += 1
+            self.SpacePressTime += 1
 
+    # [Enter] Press for 1. Show a Trial Information 2. Show a electronic elements
     def EnterPress(self, event):
 
+        # the first time press [Enter]: show a Trial Information
         if self.EnterPressTime == 0:
             self.currentTrial = self.cmd.read_command_by_line()
             print self.currentTrial
@@ -355,6 +358,8 @@ class Experiment_Session:
                 else:
                     self.Question_text.set("No Question just Press [Enter] to Proceed")
 
+        # Write the current user trial data information to output file
+        # and choice and show a trial Information
         elif self.EnterPressTime % 2 == 0:
 
             if self.currentTrial[0] == '1':
