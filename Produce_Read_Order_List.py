@@ -15,7 +15,7 @@ class Produce_Read_Order_List:
         self.Cognitive_Load = [0, 1]
         self.Handness = [0, 1]
         self.Force_Profile = ['FP01', 'FP02', 'FP03', 'FP04', 'FP05', 'FP06', 'FP07', 'FP08']
-        self.Repeated_Times = ['RT01', 'RT02', 'RT02', 'RT03', 'RT04', 'RT05', 'RT06', 'RT07', 'RT08', 'RT09']
+        self.Repeated_Times = ['RT01', 'RT02', 'RT03', 'RT04', 'RT05', 'RT06', 'RT07', 'RT08', 'RT09']
         self.read_line_counter = 0
         self.current_user_num = -1
 
@@ -68,7 +68,6 @@ class Produce_Read_Order_List:
         f = open("Order_List/User_"+str(self.current_user_num) + "_order_list.txt", "w")
         header = "Recognition_Load,Handness,Force_Profile,Repeated_Times\n"
         f.write(header)
-
         pairs = self.pairs
         pairs_list = [pairs[:], pairs[:], pairs[:], pairs[:]]
         user_name = "User" + str(self.current_user_num)
@@ -84,9 +83,10 @@ class Produce_Read_Order_List:
         print "User_Order_List Start Up Complete"
 
     # Store the parsed commands in internal Self.Commands variable
-    def read_command(self):
+    def read_command(self, filename=None):
         counter = 0
-        filename = "Order_List/User_" + str(self.current_user_num) + "_order_list.txt"
+        if filename is None:
+            filename = "Order_List/User_" + str(self.current_user_num) + "_order_list.txt"
         with open(filename) as f:
             for line in f:
                 if counter != 0 and len(line) != 0:
@@ -97,16 +97,19 @@ class Produce_Read_Order_List:
 
     # Read the commands from self.Commands line by line
     def read_command_by_line(self):
-        # print len(self.Commands)
         self.read_line_counter += 1
         return self.Commands[self.read_line_counter - 1]
 
 
-# Useage format
+# # Useage format
 # cmd = Produce_Read_Order_List()
 # cmd.make_pairs()
 # cmd.start_up(16)
 # cmd.read_command()
+#
+# for i in range(len(cmd.Commands)):
+#     print cmd.read_command_by_line()
+
 
 # print cmd.Commands
 # print "******************************"

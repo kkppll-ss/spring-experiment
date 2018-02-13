@@ -244,16 +244,22 @@ class Experiment_Session:
             if self.user_gender == "":
                 tkMessageBox.showinfo(title='Warning', message='Please complete gender')
                 return
+
             if self.entryStartFromTrial.get() != "":
                 self.startTrialNum = int(self.entryStartFromTrial.get())
 
-            self.cmd.start_up(int(user_num))     # Produce commands by user number
-            self.cmd.read_command()              # Read commands => commands
-            # write the head information to the first line in the file
-            self.outputfile = open("Records/User_" + str(user_num) + "_record.txt", "w")
-            self.outputfile.write(
-                "User_name,User_age,User_gender,Times,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,ask_last_num,user_RL_Choice \n")
-            self.outputfile.close()
+            # check the existance of program crash
+            if self.startTrialNum != 0:
+                existFilename = "Order_List/User_" + str(user_num) + "_order_list.txt"
+                self.cmd.read_command(existFilename)               # Read commands => commands
+            else:
+                self.cmd.start_up(int(user_num))  # Produce commands by user number
+                self.cmd.read_command()  # Read commands => commands
+                # write the head information to the first line in the file
+                self.outputfile = open("Records/User_" + str(user_num) + "_record.txt", "w")
+                self.outputfile.write(
+                    "User_name,User_age,User_gender,Times,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,ask_last_num,user_RL_Choice \n")
+                self.outputfile.close()
 
             # Re-open the output file again for later record useage
             self.outputfile = open("Records/User_" + str(user_num) + "_record.txt", "a")
@@ -368,6 +374,7 @@ class Experiment_Session:
             self.write_info += str(self.ask_last_num) + ","
             self.write_info += str(self.user_choice) + "\n"
             self.outputfile.write(self.write_info)
+            self.outputfile.flush()
             self.write_info = ""
 
             # Begin the next trial
