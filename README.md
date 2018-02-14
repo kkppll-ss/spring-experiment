@@ -7,7 +7,7 @@ The Python Tk GUI for Haptic Spring Project
 * Pillow-PIL >= 0.1.dev0
 * mp3play	=> 0.1.15
 
-# Main Files and Directories
+# Files and Directories
 * `Produce_Read_Order_list.py`: Produce the counter balance array for each user and randomize the pairs of `(haptic_patterns, repeated times)`.
 * `GUI_reorder_main.py`: Main GUI interface of the whole system.
 * `Sound`: Sounds of the electronic elements pronouncation
