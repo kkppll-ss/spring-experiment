@@ -4,6 +4,7 @@ import time
 import Tkinter
 import tkMessageBox
 import Produce_Read_Order_List
+from play_electronic_element import play_electronic_element
 from Tkinter import *
 import ImageTk
 import Image
@@ -40,6 +41,7 @@ class Experiment_Session:
         self.startTrialNum = 0     # Start number specified for program crash
         self.outputfile = None     # Output file for trial recording
         self.currentTrial = None   # Current trial information
+        self.play_electronic_element = None
         self.SpacePressTime = 0    # Times of press [Space]
         self.EnterPressTime = 0    # Times of press [Enter]
         self.user_choice = -1      # User choice of last i'th electronic element
@@ -64,49 +66,55 @@ class Experiment_Session:
 
         # Top level Panel for user information enter, show at program boot, hide when information entered and confirmed
         top_entry_y = h/80
+        top_col_1 = w/15
+        top_col_2 = top_col_1 + w/12 + w/18
+        top_col_3 = top_col_2 + w/12 + w/18
+        top_col_4 = top_col_3 + w/12 + w/18
+        top_col_5 = top_col_4 + w / 12 + w / 15
+        top_col_6 = top_col_5 + w / 12 + w / 12
+
         self.labelNum = Tkinter.Label(self.root, text='User Num:')
-        self.labelNum.place(x=w/80, y=top_entry_y, width=w/12, height=h/20)
+        self.labelNum.place(x=top_col_1, y=top_entry_y, width=w/12, height=h/20)
         self.labelNum.config(font=("Courier", 15, "bold"))
         self.entryNum = Tkinter.Entry(self.root, textvariable=self.varNum)
-        self.entryNum.place(x=w/80 + w/12, y=top_entry_y, width=w/18, height=h/20)
+        self.entryNum.place(x=top_col_1 + w/12, y=top_entry_y, width=w/18, height=h/20)
 
         self.LabelName = Tkinter.Label(self.root, text='Name:')
-        self.LabelName.place(x=w/80 + w/12 + w/20, y=top_entry_y, width=w/12, height=h/20)
+        self.LabelName.place(x=top_col_2, y=top_entry_y, width=w/12, height=h/20)
         self.LabelName.config(font=("Courier", 15, "bold"))
         self.entryName = Tkinter.Entry(self.root, textvariable=self.varName)
-        self.entryName.place(x=w/80 + 2 * w/12 + w/20, y=top_entry_y, width=w/20, height=h/20)
+        self.entryName.place(x=top_col_2 + w/12, y=top_entry_y, width=w/20, height=h/20)
 
         self.LabelGender = Tkinter.Label(self.root, text='Gender:')
-        self.LabelGender.place(x=w/80 + 2 * w/12 + 2 * w/20, y=top_entry_y, width=w/12, height=h/20)
+        self.LabelGender.place(x=top_col_3, y=top_entry_y, width=w/12, height=h/20)
         self.LabelGender.config(font=("Courier", 15, "bold"))
         self.entryGender = Tkinter.Entry(self.root, width=80, textvariable=self.varGender)
-        self.entryGender.place(x=w/80 + 3 * w/12 + 2 * w/20, y=top_entry_y, width=w/20, height=h/20)
+        self.entryGender.place(x=top_col_3 + w/12, y=top_entry_y, width=w/20, height=h/20)
 
         self.LabelAge = Tkinter.Label(self.root, text='Age:')
-        self.LabelAge.place(x=w/80 + 3 * w/12 + 3 * w/20, y=top_entry_y, width=w/12, height=h/20)
+        self.LabelAge.place(x=top_col_4, y=top_entry_y, width=w/12, height=h/20)
         self.LabelAge.config(font=("Courier", 15, "bold"))
         self.entryAge = Tkinter.Entry(self.root, width=80, textvariable=self.varAge)
-        self.entryAge.place(x=w/80 + 4 * w/12 + 3 * w/20, y=top_entry_y, width=w/20, height=h/20)
+        self.entryAge.place(x=top_col_4 + w/12, y=top_entry_y, width=w/20, height=h/20)
 
         self.LabelStartFromTrial = Tkinter.Label(self.root, text='Start Num:')
-        self.LabelStartFromTrial.place(x=w/80 + 4 * w/12 + 4 * w/20, y=top_entry_y, width=w / 12, height=h / 20)
+        self.LabelStartFromTrial.place(x=top_col_5, y=top_entry_y, width=w / 12, height=h / 20)
         self.LabelStartFromTrial.config(font=("Courier", 15, "bold"))
         self.entryStartFromTrial = Tkinter.Entry(self.root, width=80, textvariable=self.startTrialNum)
-        self.entryStartFromTrial.place(x=w/80 + 5 * w/12 + 4 * w/20, y=top_entry_y, width=w / 20, height=h / 20)
+        self.entryStartFromTrial.place(x=top_col_5 + w/12, y=top_entry_y, width=w / 20, height=h / 20)
 
         self.buttonOk = Tkinter.Button(self.root, text='Confirm', command=self.login)
-        self.buttonOk.place(x=w/80 + 5 * w/12 + 6 * w/20, y=top_entry_y, width=w / 20, height=h / 20)
+        self.buttonOk.place(x=top_col_6, y=top_entry_y, width=w / 20, height=h / 20)
         self.buttonOk.config(font=("Courier", 12, "bold"))
         self.buttonCancel = Tkinter.Button(self.root, text='Cancel', command=self.cancel)
-        self.buttonCancel.place(x=w/80 + 6 * w/12 + 6 * w/20, y=top_entry_y, width=w / 20, height=h / 20)
+        self.buttonCancel.place(x=top_col_6 + w/18, y=top_entry_y, width=w / 20, height=h / 20)
         self.buttonCancel.config(font=("Courier", 12, "bold"))
 
-        self.Info_Header = Label(self.root, text="Times\tRecongition Load\tHandness\tForce Profile\tRepeated Times")
+        self.Info_Header = Label(self.root, text="Times\tRecongition Load\tHandness\tForce Profile\tRepeated Times", anchor=W)
         self.Info_Header.config(font=("Courier", 12, "bold"))
 
-        self.Info = Label(self.root, textvariable=self.TrialInfo)
+        self.Info = Label(self.root, textvariable=self.TrialInfo, anchor=W)
         self.Info.config(font=("Courier", 12, "bold"))
-        # self.Info.place_forget()
 
         # Set up and place the images at the second level
         img_1 = Image.open('img/F01.jpg')
@@ -141,10 +149,10 @@ class Experiment_Session:
         img_8 = img_8.resize((w / 6, h / 6), Image.ANTIALIAS)
         img_8 = ImageTk.PhotoImage(img_8)
 
-        col_x_1 = w / 80
-        col_x_2 = 6 * w / 80 + w / 6
-        col_x_3 = 12 * w / 80 + 2 * w / 6
-        col_x_4 = 18 * w / 80 + 3 * w / 6
+        col_x_1 = w / 15
+        col_x_2 = 2 * w/15 + w / 6
+        col_x_3 = 3 * w/15 + 2 * w / 6
+        col_x_4 = 4 * w/15 + 3 * w / 6
 
         label_level_1_y = top_entry_y + 2 * h/20
         label_level_2_y = top_entry_y + 4 * h / 20 + h / 6
@@ -155,12 +163,12 @@ class Experiment_Session:
         self.FP1 = Label(self.root, text="Force Profile 1", fg='blue')
         self.FP1.place(x=col_x_1, y=label_level_1_y)
         self.FP1.config(font=("Courier", 15, "bold"))
-        Label(self.root, text="abc", image=img_1).place(x=w / 80, y=img_level_1_y)
+        Label(self.root, text="abc", image=img_1).place(x=col_x_1, y=img_level_1_y)
 
         self.FP2 = Label(self.root, text="Force Profile 2", fg='blue')
         self.FP2.place(x=col_x_2, y=label_level_1_y)
         self.FP2.config(font=("Courier", 15, "bold"))
-        Label(self.root, text="abc", image=img_2).place(x= col_x_2, y=img_level_1_y)
+        Label(self.root, text="abc", image=img_2).place(x=col_x_2, y=img_level_1_y)
 
         self.FP3 = Label(self.root, text="Force Profile 3", fg='blue')
         self.FP3.place(x=col_x_3, y=label_level_1_y)
@@ -175,7 +183,7 @@ class Experiment_Session:
         self.FP5 = Label(self.root, text="Force Profile 5", fg='blue')
         self.FP5.place(x=col_x_1, y= label_level_2_y)
         self.FP5.config(font=("Courier", 15, "bold"))
-        Label(self.root, text="abc", image=img_5).place(x=w / 80, y=img_level_2_y)
+        Label(self.root, text="abc", image=img_5).place(x=col_x_1, y=img_level_2_y)
 
         self.FP6 = Label(self.root, text="Force Profile 6", fg='blue')
         self.FP6.place(x=col_x_2, y=label_level_2_y)
@@ -193,9 +201,9 @@ class Experiment_Session:
         Label(self.root, text="abc", image=img_8).place(x=col_x_4, y=img_level_2_y)
 
         # User haptic feel part and Quize part
-        self.Question = Label(self.root, textvariable=self.Question_text, text="hello world")
-        self.Question.place(x=5*w/16, y=2*h/3)
-        self.Question.config(font=("Courier", 15, "bold"))
+        self.Question = Label(self.root, textvariable=self.Question_text)
+        # self.Question.place(x=5*w/16, y=2*h/3)
+        # self.Question.config(font=("Courier", 15, "bold"))
 
         self.User_Answer = Tkinter.Label(self.root, text='Answer: ', fg="blue")
         self.User_Answer.place(x=w/2 - w/10, y=7*h/8)
@@ -206,25 +214,6 @@ class Experiment_Session:
         self.root.mainloop()
 
     def login(self):
-
-        # Hide the label and entry from the panel
-        self.labelNum.place_forget()
-        self.entryNum.place_forget()
-        self.LabelName.place_forget()
-        self.entryName.place_forget()
-        self.LabelGender.place_forget()
-        self.entryGender.place_forget()
-        self.LabelAge.place_forget()
-        self.entryAge.place_forget()
-        self.LabelStartFromTrial.place_forget()
-        self.entryStartFromTrial.place_forget()
-        self.buttonOk.place_forget()
-        self.buttonCancel.place_forget()
-
-        # Show the trial information after confirmation
-        self.Info_Header.place(x=self.width / 80, y=self.height / 80, width=3 * self.width / 4, height=self.height / 25)
-        self.Info_Header.config(bg="red")
-        self.Info.place(x=self.width/80, y=self.height/80 + self.height/20, width=3 * self.width / 4, height=self.height/25)
 
         user_num = self.entryNum.get()
         if user_num == "":
@@ -259,13 +248,36 @@ class Experiment_Session:
                 # write the head information to the first line in the file
                 self.outputfile = open("Records/User_" + str(user_num) + "_record.txt", "w")
                 self.outputfile.write(
-                    "User_name,User_age,User_gender,Times,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,ask_last_num,user_RL_Choice \n")
+                    "User_name,User_age,User_gender,Times,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,ask_last_num,actual electronic element,user_RL_Choice \n")
                 self.outputfile.close()
 
             # Re-open the output file again for later record useage
             self.outputfile = open("Records/User_" + str(user_num) + "_record.txt", "a")
         else:
             tkMessageBox.showinfo('Error', message='Please enter an valid number[0-16]')
+
+        # Hide the label and entry from the panel
+        self.labelNum.place_forget()
+        self.entryNum.place_forget()
+        self.LabelName.place_forget()
+        self.entryName.place_forget()
+        self.LabelGender.place_forget()
+        self.entryGender.place_forget()
+        self.LabelAge.place_forget()
+        self.entryAge.place_forget()
+        self.LabelStartFromTrial.place_forget()
+        self.entryStartFromTrial.place_forget()
+        self.buttonOk.place_forget()
+        self.buttonCancel.place_forget()
+
+        # Show the trial information after confirmation
+        self.Info_Header.place(x=15 * self.width / 80, y=self.height / 80, width=5 * self.width / 8, height=self.height / 25)
+        self.Info_Header.config(bg="red", fg="white")
+        self.Info_Header.config(font=("Courier", 15, "bold"))
+
+        self.Info.place(x=15 * self.width/80, y=self.height/80 + self.height/22, width=5 * self.width / 8, height=self.height/25)
+        self.Info.config(font=("Courier", 15, "bold"))
+        self.Info.config(bg="blue", fg="white")
 
     def cancel(self):
         self.varNum.set('')
@@ -285,14 +297,33 @@ class Experiment_Session:
             if self.SpacePressTime % 2 == 0:
                 self.start = int(round(time.time() * 1000))
                 self.Question_text.set("Haptic TEST START")
+                self.Question.place(x= 6 * self.width / 16, y=3 * self.height / 4)
+                self.Question.config(font=("Courier", 23, "bold"))
+                self.Question.config(fg="red")
+
+                # Start to play the electronic element
+                if self.currentTrial[0] == '1':
+                    self.play_electronic_element = play_electronic_element()
+                    self.play_electronic_element.start()
+
                 # self.spring = Spring()
                 # # self.spring.set_profile(currFP)
                 # self.spring.start()
             else:
                 # self.spring.terminate()
+                if self.currentTrial[0] == '1':
+                    self.play_electronic_element.terminate()
+
                 self.deltatime = int(round(time.time() * 1000)) - self.start
                 self.Question_text.set("Haptic TEST END")
+                self.Question.place(x= 6 * self.width / 16, y=3 * self.height / 4)
+                self.Question.config(font=("Courier", 23, "bold"))
+                self.Question.config(fg="green")
+
                 self.Question.after(1000, lambda: self.Question_text.set("Please select a haptic feeling you sensed"))
+                self.Question.place(x= 4 * self.width / 16, y=3 * self.height / 4)
+                self.Question.config(font=("Courier", 23, "bold"))
+                self.Question.config(fg="blue")
             self.SpacePressTime += 1
 
     # [Enter] Press for 1. Show a Trial Information 2. Show a electronic elements
@@ -311,26 +342,26 @@ class Experiment_Session:
             else:
                 current_time = self.global_times_counter + self.startTrialNum
 
-            self.show_info += str(current_time) + "\t"
+            self.show_info += "  "+str(current_time) + "\t   "
             self.write_info += str(current_time) + ","
 
             for i in range(len(self.currentTrial)):
                 if i == 0:
                     if self.currentTrial[i] == '1':
-                        self.show_info += "True\t\t"
+                        self.show_info += "  True\t\t"
                         self.write_info += "1,"
                     else:
-                        self.show_info += "False\t\t"
+                        self.show_info += "  False\t\t"
                         self.write_info += "0,"
                 if i == 1:
                     if self.currentTrial[i] == '1':
-                        self.show_info += "True\t\t"
+                        self.show_info += "True\t\t   "
                         self.write_info += "1,"
                     else:
-                        self.show_info += "False\t\t"
+                        self.show_info += "False\t\t   "
                         self.write_info += "0,"
                 if i == 2:
-                    self.show_info += self.currentTrial[i]+"\t\t"
+                    self.show_info += self.currentTrial[i]+"\t\t    "
                     self.write_info += self.currentTrial[i] + ","
                 if i == 3:
                     self.show_info += self.currentTrial[i]
@@ -351,10 +382,10 @@ class Experiment_Session:
 
                 if self.currentTrial[0] == '1':
                     self.ask_last_num = random.randrange(1, 7)  # random number for quiz of last element
-                    self.Question_text.set("Select the last " + str(self.ask_last_num) + " electronic element\n\n"
-                                                                                        "1. Resistor  2. Capacitor\n"
-                                                                                        "3. LED       4. Transistor\n"
-                                                                                        "       5. Inductor  6.Integrated Circuit")
+                    self.Question_text.set("Select the last " + str(self.ask_last_num) + "th electronic element\n\n"+"1. Resistor  2. Capacitor\n"+"3. LED       4. Transistor\n"+"       5. Inductor  6.Integrated Circuit")
+                    self.Question.place(x=9*self.width/32, y=3*self.height/4, anchor=W)
+                    self.Question.config(font=("Courier", 20, "bold"))
+                    self.Question.config(bg="grey", fg="black")
                 else:
                     self.Question_text.set("No Question just Press [Enter] to Proceed")
 
@@ -375,8 +406,13 @@ class Experiment_Session:
             self.Question_text.set("")
             self.Answer.set("")
 
+            self.write_info += str(self.deltatime) + ","
             self.write_info += str(self.User_feel_FP) + ","
             self.write_info += str(self.ask_last_num) + ","
+            if self.currentTrial[0] == '1':
+                self.write_info += str(self.play_electronic_element.last_i_th(self.ask_last_num)) + ","
+            else:
+                self.write_info += str(-1) + ","
             self.write_info += str(self.user_choice) + "\n"
             self.outputfile.write(self.write_info)
             self.outputfile.flush()
