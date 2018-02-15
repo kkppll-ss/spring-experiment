@@ -459,6 +459,7 @@ class Experiment_Session:
                         self.user_choice = int(self.entry_Answer.get())
                     else:
                         tkMessageBox.showinfo(title='Notice', message='Your Choice MUST BE Integer in [1-6]')
+                        return
 
                 result = tkMessageBox.askyesno('Notice', message='Your Recognition Load Choice: ' + str(self.user_choice) + '\nCan you confirm ?')
                 if result is True:
