@@ -10,7 +10,6 @@ import ImageTk
 import Image
 import random
 # from Spring import Spring
-from SpringTest import Spring
 
 
 class Experiment_Session:
@@ -47,7 +46,7 @@ class Experiment_Session:
         self.EnterPressTime = 0             # Times of press [Enter]
         self.PressSpaceTwice = False        # Space pressed for more than twice without [Enter]
         self.user_choice = -1               # User choice of last i'th electronic element
-        self.ask_last_num = 0               # the last i'th elements hear of under the Recongnition load
+        self.ask_last_num = -1               # the last i'th elements hear of under the Recongnition load
         self.trackLength = 0                # track the length of the sound playlist
         self.write_info = ""                # Information written to output file
         self.show_info = ""                 # Information showed on the panel
@@ -116,7 +115,7 @@ class Experiment_Session:
         self.buttonCancel.place(x=top_col_6 + w/18, y=top_entry_y, width=w / 20, height=h / 20)
         self.buttonCancel.config(font=("Courier", 12, "bold"))
 
-        self.Info_Header = Label(self.root, text="Times\tRecongition Load\tHandness\tForce Profile\tRepeated Times", anchor=W)
+        self.Info_Header = Label(self.root, text="Trial\tRecongition Load\tHandness\tComponent", anchor=W)
         self.Info_Header.config(font=("Courier", 12, "bold"))
 
         self.Info = Label(self.root, textvariable=self.TrialInfo, anchor=W)
@@ -256,7 +255,7 @@ class Experiment_Session:
                 # write the head information to the first line in the file
                 self.outputfile = open("Records/User_" + str(self.user_num) + "_record.txt", "w")
                 self.outputfile.write(
-                    "User_num,User_name,User_age,User_gender,Times,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,ask_last_num,actual electronic element,user_RL_Choice \n")
+                    "User_num,User_name,User_age,User_gender,Trials,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice Correctness, ask_last_num,actual electronic element,user_RL_Choice,Recognition_Load_Correctness \n")
                 self.outputfile.close()
 
             # Re-open the output file again for later record useage
@@ -279,11 +278,11 @@ class Experiment_Session:
         self.buttonCancel.place_forget()
 
         # Show the trial information after confirmation
-        self.Info_Header.place(x=15 * self.width / 80, y=self.height / 80, width=5 * self.width / 8, height=self.height / 25)
+        self.Info_Header.place(x=23 * self.width / 80, y=self.height / 80, width=29 * self.width / 64, height=self.height / 25)
         self.Info_Header.config(bg="red", fg="white")
         self.Info_Header.config(font=("Courier", 15, "bold"))
 
-        self.Info.place(x=15 * self.width/80, y=self.height/80 + self.height/22, width=5 * self.width / 8, height=self.height/25)
+        self.Info.place(x=23 * self.width/80, y=self.height/80 + self.height/22, width=29 * self.width / 64, height=self.height/25)
         self.Info.config(font=("Courier", 15, "bold"))
         self.Info.config(bg="blue", fg="white")
 
@@ -330,8 +329,8 @@ class Experiment_Session:
                 # Stop play the sound of electronic element
                 if self.currentTrial[0] == '1':
                     self.play_electronic_element.terminate()
+                    self.trackLength = len(self.play_electronic_element.traceList)
 
-                self.trackLength = len(self.play_electronic_element.traceList)
                 self.deltatime = int(round(time.time() * 1000)) - self.start
                 self.Question_text.set("Haptic Test END")
                 self.Question.place(x=7 * self.width / 16, y=3 * self.height / 4)
@@ -346,6 +345,11 @@ class Experiment_Session:
 
     # [Enter] Press for 1. Show a Trial Information 2. Show a electronic elements
     def EnterPress(self, event):
+
+        # Error Handling
+        if self.user_num == -1 or self.user_name == "" or self.user_gender == "" or self.user_age == "":
+            tkMessageBox.showinfo('Warning', message='Please Complete the Personal Info before proceed')
+            return
 
         # the first time press [Enter]: show a Trial Information
         if self.EnterPressTime == 0:
@@ -373,14 +377,14 @@ class Experiment_Session:
                         self.write_info += "0,"
                 if i == 1:
                     if self.currentTrial[i] == '1':
-                        self.show_info += "True\t\t   "
+                        self.show_info += "Dominant\t   "
                         self.write_info += "1,"
                     else:
-                        self.show_info += "False\t\t   "
+                        self.show_info += "Non-Dominant\t   "
                         self.write_info += "0,"
                 if i == 2:
-                    self.show_info += self.currentTrial[i]+"\t\t    "
                     self.write_info += self.currentTrial[i] + ","
+                #   self.show_info += self.currentTrial[i]+"\t\t    "
                 if i == 3:
                     self.show_info += self.currentTrial[i]
                     self.write_info += self.currentTrial[i] + ","
@@ -390,13 +394,23 @@ class Experiment_Session:
             self.show_info = ""
 
         elif self.EnterPressTime % 2 == 1:
+
+            # Unfinished Haptic Test
+            if self.PressSpaceTwice is False:
+                tkMessageBox.showinfo('Warning', message='Finish Haptic Test before proceed Press [Space]')
+                return
+
             if len(self.entry_Answer.get()) == 0:
                 tkMessageBox.showinfo('Warning', message='Enter your actual feel before proceed')
                 return
             else:
                 if self.entry_Answer.get().strip().isdigit() and 0 < int(self.entry_Answer.get().strip()) < 9:
                     self.User_feel_FP = int(self.entry_Answer.get())
-                    tkMessageBox.showinfo(title='Notice', message='Haptic Choice Successfully Entered')
+                    result = tkMessageBox.askyesno(title='Notice', message='Your Haptic Choice: '+str(self.User_feel_FP)+'\nCan you confirm ?')
+                    if result is True:
+                        pass
+                    else:
+                        return
                 else:
                     tkMessageBox.showinfo(title='Notice', message='Your Choice MUST BE Integer in [1-8]')
                     return
@@ -446,10 +460,13 @@ class Experiment_Session:
                     else:
                         tkMessageBox.showinfo(title='Notice', message='Your Choice MUST BE Integer in [1-6]')
 
-
+                result = tkMessageBox.askyesno('Notice', message='Your Recognition Load Choice: ' + str(self.user_choice) + '\nCan you confirm ?')
+                if result is True:
+                    pass
+                else:
+                    return
             else:
                 self.user_choice = -1
-            tkMessageBox.showinfo('Notice', message='Question answered successfully')
 
             self.Question_text.set("")
             self.Question_choice_row_1.set("")
@@ -459,12 +476,18 @@ class Experiment_Session:
 
             self.write_info += str(self.deltatime) + ","
             self.write_info += str(self.User_feel_FP) + ","
+            self.write_info += str(int(self.User_feel_FP) == int(self.currentTrial[2])) + ","
             self.write_info += str(self.ask_last_num) + ","
+
             if self.currentTrial[0] == '1':
                 self.write_info += str(self.play_electronic_element.last_i_th(self.ask_last_num)) + ","
+                self.write_info += str(self.user_choice) + ","
+                self.write_info += str(int(self.user_choice) == int(self.play_electronic_element.last_i_th(self.ask_last_num))) + "\n"
             else:
                 self.write_info += str(-1) + ","
-            self.write_info += str(self.user_choice) + "\n"
+                self.write_info += str(self.user_choice) + ","
+                self.write_info += str(-1) + "\n"
+
             self.outputfile.write(self.write_info)
             self.outputfile.flush()
             self.write_info = ""
