@@ -93,7 +93,7 @@ class Spring(threading.Thread):
                             x_to_k = int(round(self.x * 1000))
                             k, damping = self._get_k(x_to_k)
                             if self.callback:
-                                self.callback("%d %0.3f %0.3f" % (k, self.average_force, setpoint))
+                                self.callback("%0.3f" % setpoint)
                             logging.info("sensor: %d force: %0.2f"
                                          , force_sensor, self.average_force)
                             self._apply_f(self.average_force, k, damping)
@@ -190,7 +190,7 @@ class Spring(threading.Thread):
         elif profile == "decreasing":
             self._set_parameters("linear", k1=30, k2=5, left_point=0, right_point=40)
         elif profile == "click":
-            self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=20, right_point=30, width=0)
+            self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=20, right_point=30, width=2)
         elif profile == "drop":
             self._set_parameters("drop", k1=70, k2=5, drop_point=10)
         elif profile == "pseudo_click":
