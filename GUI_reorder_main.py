@@ -30,11 +30,20 @@ class Experiment_Session:
         self.user_name = ""
         self.user_gender = ""
         self.user_age = 0
+        self.haptic_feel_lookup = {
+            1: 'low',
+            2: 'high',
+            3: 'medium',
+            4: 'increasing',
+            5: 'decreasing',
+            6: 'click',
+            7: 'drop'
+        }
 
         self.cmd = Produce_Read_Order_List.Produce_Read_Order_List()  # Instance of produce list of command
         self.cmd.make_pairs()                                         # Make pairs of order list [Haptic num * Repeated time]
 
-        self.User_feel_FP = -1              # record the user's actual choice of haptic feeling
+        self.User_feel_FP = ""              # record the user's actual choice of haptic feeling
         self.global_times_counter = 0       # record the user's repeated times
         self.start = 0                      # Start timestamp for haptic sensing
         self.end = 0                        # End timestamp for haptic sensing
@@ -169,42 +178,42 @@ class Experiment_Session:
         img_level_1_y = top_entry_y + 3 * h/20
         img_level_2_y = top_entry_y + 5 * h / 20 + h/6
 
-        self.FP1 = Label(self.root, text="Force Profile 1", fg='blue')
+        self.FP1 = Label(self.root, text="1. low", fg='blue')
         self.FP1.place(x=col_x_1, y=label_level_1_y)
         self.FP1.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_1).place(x=col_x_1, y=img_level_1_y)
 
-        self.FP2 = Label(self.root, text="Force Profile 2", fg='blue')
+        self.FP2 = Label(self.root, text="2. high", fg='blue')
         self.FP2.place(x=col_x_2, y=label_level_1_y)
         self.FP2.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_2).place(x=col_x_2, y=img_level_1_y)
 
-        self.FP3 = Label(self.root, text="Force Profile 3", fg='blue')
+        self.FP3 = Label(self.root, text="3. medium", fg='blue')
         self.FP3.place(x=col_x_3, y=label_level_1_y)
         self.FP3.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_3).place(x=col_x_3, y=img_level_1_y)
 
-        self.FP4 = Label(self.root, text="Force Profile 4", fg='blue')
+        self.FP4 = Label(self.root, text="4. increasing", fg='blue')
         self.FP4.place(x=col_x_4, y=label_level_1_y)
         self.FP4.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_4).place(x=col_x_4, y=img_level_1_y)
 
-        self.FP5 = Label(self.root, text="Force Profile 5", fg='blue')
+        self.FP5 = Label(self.root, text="5. decreasing", fg='blue')
         self.FP5.place(x=col_x_1, y= label_level_2_y)
         self.FP5.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_5).place(x=col_x_1, y=img_level_2_y)
 
-        self.FP6 = Label(self.root, text="Force Profile 6", fg='blue')
+        self.FP6 = Label(self.root, text="6. click", fg='blue')
         self.FP6.place(x=col_x_2, y=label_level_2_y)
         self.FP6.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_6).place(x=col_x_2, y=img_level_2_y)
 
-        self.FP7 = Label(self.root, text="Force Profile 7", fg='blue')
+        self.FP7 = Label(self.root, text="7. drop", fg='blue')
         self.FP7.place(x=col_x_3, y=label_level_2_y)
         self.FP7.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_7).place(x=col_x_3, y=img_level_2_y)
 
-        self.FP8 = Label(self.root, text="Force Profile 8", fg='blue')
+        self.FP8 = Label(self.root, text="8. Force Profile 8", fg='blue')
         self.FP8.place(x=col_x_4, y=label_level_2_y)
         self.FP8.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_8).place(x=col_x_4, y=img_level_2_y)
@@ -212,12 +221,14 @@ class Experiment_Session:
         # User haptic feel part and Quize part
         self.Question = Label(self.root, textvariable=self.Question_text)
 
+        # Show the current position information on right side
         self.CurrPosition = Label(self.root, text="Position Info", textvariable=self.Position_Info)
         self.CurrPosition.place(x=12 * self.width / 16, y=7 * self.height / 8)
         self.CurrPosition.config(font=("Courier", 15, "bold"), fg="red")
 
+        # Show the Force Profile on left side
         self.CurrDebug = Label(self.root, text="Debug Info", textvariable=self.Debug_Info)
-        self.CurrDebug.place(x=3 * self.width / 16, y=3 * self.height / 4)
+        self.CurrDebug.place(x=2 * self.width / 16, y=3 * self.height / 4)
         self.CurrDebug.config(font=("Courier", 20, "bold"), fg="red")
 
         self.Choice_row_1 = Label(self.root, textvariable=self.Question_choice_row_1)
@@ -419,8 +430,8 @@ class Experiment_Session:
                 return
             else:
                 if self.entry_Answer.get().strip().isdigit() and 0 < int(self.entry_Answer.get().strip()) < 9:
-                    self.User_feel_FP = int(self.entry_Answer.get())
-                    result = tkMessageBox.askyesno(title='Notice', message='Your Haptic Choice: '+str(self.User_feel_FP)+'\nCan you confirm ?')
+                    self.User_feel_FP = self.haptic_feel_lookup[int(self.entry_Answer.get())]
+                    result = tkMessageBox.askyesno(title='Notice', message='Your Haptic Choice: '+ self.User_feel_FP +'\nCan you confirm ?')
                     if result is True:
                         pass
                     else:
@@ -506,6 +517,11 @@ class Experiment_Session:
             self.outputfile.write(self.write_info)
             self.outputfile.flush()
             self.write_info = ""
+
+            # When the trial times reach the end
+            if self.global_times_counter == len(self.cmd.Commands) - 1:
+                tkMessageBox.showinfo('Notice', message='Haptic Test End, Thank you!!')
+                return
 
             # Begin the next trial
             self.currentTrial = self.cmd.read_command_by_line()
