@@ -1,0 +1,2 @@
+User_num,User_name,User_age,User_gender,Trials,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice Correctness, ask_last_num,actual electronic element,user_RL_Choice,Recognition_Load_Correctness 
+2,343,1`43,1234,1,1,0,medium,RT03,4553,7,False,2,3,2,False

@@ -1,0 +1,15 @@
+{% for m in datas %}
+    {% if loop.index == 1 %}
+        if (proximityData < {{ m.x2 }}) {
+        input = {{ m.k | round(3) }} * proximityData + {{ m.b | round(3) }};
+        }
+    {% elif loop.index == datas | length %}
+        else {
+        input = {{ m.k | round(3) }} * proximityData + {{ m.b | round(3) }};
+        }
+    {% else %}
+        else if (proximityData < {{ m.x2 }}) {
+        input = {{ m.k | round(3) }} * proximityData + {{ m.b | round(3) }};
+        }
+    {% endif %}
+{% endfor %}

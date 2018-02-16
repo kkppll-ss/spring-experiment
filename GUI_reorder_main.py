@@ -4,12 +4,13 @@ import time
 import Tkinter
 import tkMessageBox
 import Produce_Read_Order_List
+# from Play_electronic_element import play_electronic_element
 from Play_electronic_element import play_electronic_element
 from Tkinter import *
 import ImageTk
 import Image
 import random
-# from Spring import Spring
+from spring import Spring
 
 
 class Experiment_Session:
@@ -57,6 +58,8 @@ class Experiment_Session:
         self.Question_choice_row_1 = Tkinter.StringVar(value='')    # First row of choice of question
         self.Question_choice_row_2 = Tkinter.StringVar(value='')    # Second row of choice of question
         self.Question_choice_row_3 = Tkinter.StringVar(value='')    # Third row of choice of question
+        self.Position_Info = Tkinter.StringVar(value='')            # Position Information about the Spring
+
 
         # Bind the Space Key press to continue
         self.root.bind("<KeyPress>", self.SpaceContinue)            # Bind the [Space] press and its function
@@ -207,6 +210,9 @@ class Experiment_Session:
 
         # User haptic feel part and Quize part
         self.Question = Label(self.root, textvariable=self.Question_text)
+        self.CurrPosition = Label(self.root, text="Position Info", textvariable=self.Position_Info)
+        self.CurrPosition.place(x=12 * self.width / 16, y=3 * self.height / 4)
+        self.CurrPosition.config(font=("Courier", 20, "bold"), fg="red")
         self.Choice_row_1 = Label(self.root, textvariable=self.Question_choice_row_1)
         self.Choice_row_2 = Label(self.root, textvariable=self.Question_choice_row_2)
         self.Choice_row_3 = Label(self.root, textvariable=self.Question_choice_row_3)
@@ -319,12 +325,12 @@ class Experiment_Session:
                     self.play_electronic_element.start()
 
                 # Create thread for handling haptic Spring
-                # self.spring = Spring()
-                # self.spring.set_profile(currFP)
-                # self.spring.start()
+                self.spring = Spring(self.Position_Info.set)
+                self.spring.set_profile(self.currentTrial[2])
+                self.spring.start()
             else:
                 # Stop the movement of Haptic Spring
-                # self.spring.terminate()
+                self.spring.terminate()
 
                 # Stop play the sound of electronic element
                 if self.currentTrial[0] == '1':
@@ -477,7 +483,7 @@ class Experiment_Session:
 
             self.write_info += str(self.deltatime) + ","
             self.write_info += str(self.User_feel_FP) + ","
-            self.write_info += str(int(self.User_feel_FP) == int(self.currentTrial[2])) + ","
+            self.write_info += str(self.User_feel_FP == self.currentTrial[2]) + ","
             self.write_info += str(self.ask_last_num) + ","
 
             if self.currentTrial[0] == '1':

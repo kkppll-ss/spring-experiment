@@ -1,2 +1,1 @@
 User_num,User_name,User_age,User_gender,Trials,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice Correctness, ask_last_num,actual electronic element,user_RL_Choice,Recognition_Load_Correctness 
-4,wyk,12,m,1,1,1,drop,RT06,23959,4,False,2,3,3,True

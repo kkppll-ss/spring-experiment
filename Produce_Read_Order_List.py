@@ -14,7 +14,7 @@ class Produce_Read_Order_List:
         self.User_Condition = {}
         self.Cognitive_Load = [0, 1]
         self.Handness = [0, 1]
-        self.Force_Profile = ['FP01', 'FP02', 'FP03', 'FP04', 'FP05', 'FP06', 'FP07', 'FP08']
+        self.Force_Profile = ['low', 'high', 'medium', 'increasing', 'decreasing', 'click', 'drop']
         self.Repeated_Times = ['RT01', 'RT02', 'RT03', 'RT04', 'RT05', 'RT06', 'RT07', 'RT08', 'RT09']
         self.read_line_counter = 0
         self.current_user_num = -1
@@ -93,7 +93,7 @@ class Produce_Read_Order_List:
                     self.Commands.append(line[:-1].split(','))
                 else:
                     counter += 1
-        print "Commands stored in internal list"
+        print "Commands stored in internal list" 
 
     # Read the commands from self.Commands line by line
     def read_command_by_line(self):
