@@ -177,7 +177,7 @@ class Spring(threading.Thread):
         logging.info("x = %s, k = %s, damping = %0.3f", x, k, damping)
         return k, damping
 
-    def set_profile(self, profile):
+    def set_profile(self, profile, length="long"):
         self.profile = profile
         if profile == "low":
             self._set_parameters("constant", k1=3)
@@ -190,7 +190,8 @@ class Spring(threading.Thread):
         elif profile == "decreasing":
             self._set_parameters("linear", k1=30, k2=5, left_point=0, right_point=40)
         elif profile == "click":
-            self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=20, right_point=30, width=2)
+            if length == "long":
+                self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=20, right_point=30, width=2)
         elif profile == "drop":
             self._set_parameters("drop", k1=70, k2=5, drop_point=10)
         elif profile == "pseudo_click":
