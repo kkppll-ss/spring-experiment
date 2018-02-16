@@ -57,7 +57,8 @@ class Spring(threading.Thread):
         def f(t, y, force, k, damping):
             displacement, velocity = y
             return [velocity,
-                    (force - k * displacement - damping * velocity) / self.mass]
+                    float(force - k * displacement - damping * velocity) / self.mass]
+
 
         self.ode_solver = ode(f)
         self.ode_solver.set_integrator("dopri5")
@@ -79,8 +80,6 @@ class Spring(threading.Thread):
                             force_sensor, setpoint, proximity, output = value.split()
                             force_sensor, proximity = int(force_sensor), float(proximity)
                             setpoint, output = float(setpoint), float(output)
-                            if self.callback:
-                                self.callback(str(setpoint))
                             if self.last_time:
                                 delta_time = now - self.last_time
                                 self.estimated_delta_time = 0.8 * self.estimated_delta_time + 0.2 * delta_time
@@ -93,6 +92,8 @@ class Spring(threading.Thread):
                                 self.average_force = force
                             x_to_k = int(round(self.x * 1000))
                             k, damping = self._get_k(x_to_k)
+                            if self.callback:
+                                self.callback("%d %0.3f %0.3f" % (k, self.average_force, setpoint))
                             logging.info("sensor: %d force: %0.2f"
                                          , force_sensor, self.average_force)
                             self._apply_f(self.average_force, k, damping)
@@ -125,7 +126,7 @@ class Spring(threading.Thread):
         elif profile == 'linear':
             self.left_point = left_point
             self.right_point = right_point
-            self.rate = (k2 - k1) / (right_point - left_point)
+            self.rate = float(k2 - k1) / (right_point - left_point)
             self.k1 = k1
             self.k2 = k2
         elif profile == "pseudo_click":
@@ -134,10 +135,10 @@ class Spring(threading.Thread):
             self.k3 = k3
             self.left_point = left_point
             self.right_point = right_point
-            self.middle_point = (self.left_point + self.right_point) / 2
+            self.middle_point = float(self.left_point + self.right_point) / 2
             self.width = width
-            self.rate = (k2 - k1) / (self.middle_point - width - self.left_point)
-            self.down_rate = (k3 - k2) / (self.right_point - (self.middle_point + width))
+            self.rate = float(k2 - k1) / (self.middle_point - width - self.left_point)
+            self.down_rate = float(k3 - k2) / (self.right_point - (self.middle_point + width))
         elif profile == 'drop':
             self.k1 = k1
             self.k2 = k2
@@ -173,7 +174,7 @@ class Spring(threading.Thread):
                 k = self.k2
 
         damping = 2 * math.sqrt(self.mass * k)
-        logging.info("x = %s, k = %s, damping = %0.3f", self.x, k, damping)
+        logging.info("x = %s, k = %s, damping = %0.3f", x, k, damping)
         return k, damping
 
     def set_profile(self, profile):
@@ -185,11 +186,11 @@ class Spring(threading.Thread):
         elif profile == "medium":
             self._set_parameters("constant", k1=15)
         elif profile == "increasing":
-            self._set_parameters("linear", k1=5, k2=50, left_point=0, right_point=100)
+            self._set_parameters("linear", k1=5, k2=50, left_point=0, right_point=40)
         elif profile == "decreasing":
-            self._set_parameters("linear", k1=30, k2=5, left_point=0, right_point=100)
+            self._set_parameters("linear", k1=30, k2=5, left_point=0, right_point=40)
         elif profile == "click":
-            self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=20, right_point=40, width=5)
+            self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=20, right_point=30, width=0)
         elif profile == "drop":
             self._set_parameters("drop", k1=70, k2=5, drop_point=10)
         elif profile == "pseudo_click":
@@ -221,8 +222,8 @@ def main():
     # spring.set_profile("medium")
     # spring.set_profile("increasing")
     # spring.set_profile("decreasing")
-    # spring.set_profile("click")
-    spring.set_profile("drop")
+    spring.set_profile("click")
+    # spring.set_profile("drop")
     # spring.set_profile("pseudo_click")
     spring.start()
     try:
