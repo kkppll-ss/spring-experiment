@@ -3,15 +3,14 @@
 import time
 import Tkinter
 import tkMessageBox
-import Produce_Read_Order_List
+import Produce_Read_Order_list_2 as Produce_Read_Order_List
 # from Play_electronic_element import play_electronic_element
-from Play_electronic_element import play_electronic_element
+from Mp3Play_electronic_element import play_electronic_element
 from Tkinter import *
 import ImageTk
 import Image
 import random
-from spring import Spring
-
+# from spring import Spring
 
 class Experiment_Session:
 
@@ -31,17 +30,18 @@ class Experiment_Session:
         self.user_gender = ""
         self.user_age = 0
         self.haptic_feel_lookup = {
-            1: 'low',
-            2: 'high',
-            3: 'medium',
-            4: 'increasing',
-            5: 'decreasing',
-            6: 'click',
-            7: 'drop'
+            1: 'empty',
+            2: 'low',
+            3: 'high',
+            4: 'medium',
+            5: 'increasing',
+            6: 'decreasing',
+            7: 'click',
+            8: 'drop'
         }
 
         self.cmd = Produce_Read_Order_List.Produce_Read_Order_List()  # Instance of produce list of command
-        self.cmd.make_pairs()                                         # Make pairs of order list [Haptic num * Repeated time]
+        # self.cmd.make_pairs()             # Make pairs of order list [Haptic num * Repeated time]
 
         self.User_feel_FP = ""              # record the user's actual choice of haptic feeling
         self.global_times_counter = 0       # record the user's repeated times
@@ -56,10 +56,11 @@ class Experiment_Session:
         self.EnterPressTime = 0             # Times of press [Enter]
         self.PressSpaceTwice = False        # Space pressed for more than twice without [Enter]
         self.user_choice = -1               # User choice of last i'th electronic element
-        self.ask_last_num = -1               # the last i'th elements hear of under the Recongnition load
+        self.ask_last_num = -1              # the last i'th elements hear of under the Recongnition load
         self.trackLength = 0                # track the length of the sound playlist
         self.write_info = ""                # Information written to output file
         self.show_info = ""                 # Information showed on the panel
+        self.pin_height = ""
 
         self.TrialInfo = Tkinter.StringVar(value='')                # Trial information
         self.Answer = Tkinter.StringVar(value='')                   # User answer
@@ -69,7 +70,6 @@ class Experiment_Session:
         self.Question_choice_row_3 = Tkinter.StringVar(value='')    # Third row of choice of question
         self.Position_Info = Tkinter.StringVar(value='')            # Position Information about the Spring
         self.Debug_Info = Tkinter.StringVar(value='')               # Debug Information about the Spring
-
 
         # Bind the Space Key press to continue
         self.root.bind("<KeyPress>", self.SpaceContinue)            # Bind the [Space] press and its function
@@ -178,42 +178,42 @@ class Experiment_Session:
         img_level_1_y = top_entry_y + 3 * h/20
         img_level_2_y = top_entry_y + 5 * h / 20 + h/6
 
-        self.FP1 = Label(self.root, text="1. low", fg='blue')
+        self.FP1 = Label(self.root, text="1. empty", fg='blue')
         self.FP1.place(x=col_x_1, y=label_level_1_y)
         self.FP1.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_1).place(x=col_x_1, y=img_level_1_y)
 
-        self.FP2 = Label(self.root, text="2. high", fg='blue')
+        self.FP2 = Label(self.root, text="2. low", fg='blue')
         self.FP2.place(x=col_x_2, y=label_level_1_y)
         self.FP2.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_2).place(x=col_x_2, y=img_level_1_y)
 
-        self.FP3 = Label(self.root, text="3. medium", fg='blue')
+        self.FP3 = Label(self.root, text="3. high", fg='blue')
         self.FP3.place(x=col_x_3, y=label_level_1_y)
         self.FP3.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_3).place(x=col_x_3, y=img_level_1_y)
 
-        self.FP4 = Label(self.root, text="4. increasing", fg='blue')
+        self.FP4 = Label(self.root, text="4. medium", fg='blue')
         self.FP4.place(x=col_x_4, y=label_level_1_y)
         self.FP4.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_4).place(x=col_x_4, y=img_level_1_y)
 
-        self.FP5 = Label(self.root, text="5. decreasing", fg='blue')
+        self.FP5 = Label(self.root, text="5. increasing", fg='blue')
         self.FP5.place(x=col_x_1, y= label_level_2_y)
         self.FP5.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_5).place(x=col_x_1, y=img_level_2_y)
 
-        self.FP6 = Label(self.root, text="6. click", fg='blue')
+        self.FP6 = Label(self.root, text="6. decreasing", fg='blue')
         self.FP6.place(x=col_x_2, y=label_level_2_y)
         self.FP6.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_6).place(x=col_x_2, y=img_level_2_y)
 
-        self.FP7 = Label(self.root, text="7. drop", fg='blue')
+        self.FP7 = Label(self.root, text="7. click", fg='blue')
         self.FP7.place(x=col_x_3, y=label_level_2_y)
         self.FP7.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_7).place(x=col_x_3, y=img_level_2_y)
 
-        self.FP8 = Label(self.root, text="8. Force Profile 8", fg='blue')
+        self.FP8 = Label(self.root, text="8. drop", fg='blue')
         self.FP8.place(x=col_x_4, y=label_level_2_y)
         self.FP8.config(font=("Courier", 15, "bold"))
         Label(self.root, text="abc", image=img_8).place(x=col_x_4, y=img_level_2_y)
@@ -251,7 +251,7 @@ class Experiment_Session:
 
         self.user_num = int(self.entryNum.get())
 
-        if 0 < self.user_num < 17:
+        if 0 < self.user_num < 13:
 
             self.user_name = self.entryName.get()
             self.user_age = self.entryAge.get()
@@ -279,13 +279,13 @@ class Experiment_Session:
                 # write the head information to the first line in the file
                 self.outputfile = open("Records/User_" + str(self.user_num) + "_record.txt", "w")
                 self.outputfile.write(
-                    "User_num,User_name,User_age,User_gender,Trials,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice Correctness, ask_last_num,actual electronic element,user_RL_Choice,Recognition_Load_Correctness \n")
+                    "User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice Correctness, ask_last_num,actual electronic element,user_RL_Choice,Recognition_Load_Correctness \n")
                 self.outputfile.close()
 
             # Re-open the output file again for later record useage
             self.outputfile = open("Records/User_" + str(self.user_num) + "_record.txt", "a")
         else:
-            tkMessageBox.showinfo('Error', message='Please enter an valid number[0-16]')
+            tkMessageBox.showinfo('Error', message='Please enter an valid number[0-12]')
 
         # Hide the label and entry from the panel
         self.labelNum.place_forget()
@@ -338,20 +338,20 @@ class Experiment_Session:
                 self.Question.config(fg="green")
 
                 # Start to play the electronic element
-                if self.currentTrial[0] == '1':
+                if self.currentTrial[1] == '1':
                     self.play_electronic_element = play_electronic_element()
                     self.play_electronic_element.start()
 
                 # Create thread for handling haptic Spring
-                self.spring = Spring(self.Position_Info.set)
-                self.spring.set_profile(self.currentTrial[2])
-                self.spring.start()
+                # self.spring = Spring(self.Position_Info.set)
+                # self.spring.set_profile(self.currentTrial[2])
+                # self.spring.start()
             else:
                 # Stop the movement of Haptic Spring
-                self.spring.terminate()
+                # self.spring.terminate()
 
                 # Stop play the sound of electronic element
-                if self.currentTrial[0] == '1':
+                if self.currentTrial[1] == '1':
                     self.play_electronic_element.terminate()
                     self.trackLength = len(self.play_electronic_element.traceList)
 
@@ -393,24 +393,27 @@ class Experiment_Session:
 
             for i in range(len(self.currentTrial)):
                 if i == 0:
+                    self.pin_height = self.currentTrial[i]
+                    self.write_info += str(self.pin_height)+","
+                if i == 1:
                     if self.currentTrial[i] == '1':
                         self.show_info += "  True\t\t"
                         self.write_info += "1,"
                     else:
                         self.show_info += "  False\t\t"
                         self.write_info += "0,"
-                if i == 1:
+                if i == 2:
                     if self.currentTrial[i] == '1':
                         self.show_info += "Dominant\t   "
                         self.write_info += "1,"
                     else:
                         self.show_info += "Non-Dominant\t   "
                         self.write_info += "0,"
-                if i == 2:
+                if i == 3:
                     self.write_info += self.currentTrial[i] + ","
                 #   self.show_info += self.currentTrial[i]+"\t\t    "
                     self.Debug_Info.set("FP: " + self.currentTrial[i])
-                if i == 3:
+                if i == 4:
                     self.show_info += self.currentTrial[i]
                     self.write_info += self.currentTrial[i] + ","
 
@@ -443,7 +446,7 @@ class Experiment_Session:
                 self.Answer.set("")
 
                 # Show the recognition load question
-                if self.currentTrial[0] == '1':
+                if self.currentTrial[1] == '1':
                     self.ask_last_num = random.randrange(1, 4)  # random number for quiz of last element
 
                     if self.ask_last_num > self.trackLength:
@@ -475,7 +478,7 @@ class Experiment_Session:
         # and choice and show a trial Information
         elif self.EnterPressTime % 2 == 0:
             # Recognition Load question answer
-            if self.currentTrial[0] == '1':
+            if self.currentTrial[1] == '1':
                 if len(self.entry_Answer.get()) == 0:
                     tkMessageBox.showinfo('Warning', message='Select the element you hear before proceed')
                     return
@@ -502,10 +505,11 @@ class Experiment_Session:
 
             self.write_info += str(self.deltatime) + ","
             self.write_info += str(self.User_feel_FP) + ","
-            self.write_info += str(self.User_feel_FP == self.currentTrial[2]) + ","
+            self.write_info += str(self.User_feel_FP == self.currentTrial[3]) + ","
+            print self.User_feel_FP+","+self.currentTrial[3]+","+str(self.User_feel_FP == self.currentTrial[3])
             self.write_info += str(self.ask_last_num) + ","
 
-            if self.currentTrial[0] == '1':
+            if self.currentTrial[1] == '1':
                 self.write_info += str(self.play_electronic_element.last_i_th(self.ask_last_num)) + ","
                 self.write_info += str(self.user_choice) + ","
                 self.write_info += str(int(self.user_choice) == int(self.play_electronic_element.last_i_th(self.ask_last_num))) + "\n"
@@ -519,7 +523,7 @@ class Experiment_Session:
             self.write_info = ""
 
             # When the trial times reach the end
-            if self.global_times_counter == len(self.cmd.Commands) - 1:
+            if self.global_times_counter == len(self.cmd.Commands):
                 tkMessageBox.showinfo('Notice', message='Haptic Test End, Thank you!!')
                 return
 
@@ -540,12 +544,8 @@ class Experiment_Session:
 
             for i in range(len(self.currentTrial)):
                 if i == 0:
-                    if self.currentTrial[i] == '1':
-                        self.show_info += "True\t\t"
-                        self.write_info += "1,"
-                    else:
-                        self.show_info += "False\t\t"
-                        self.write_info += "0,"
+                    self.pin_height = self.currentTrial[i]
+                    self.write_info += str(self.pin_height) + ","
                 if i == 1:
                     if self.currentTrial[i] == '1':
                         self.show_info += "True\t\t"
@@ -554,10 +554,17 @@ class Experiment_Session:
                         self.show_info += "False\t\t"
                         self.write_info += "0,"
                 if i == 2:
+                    if self.currentTrial[i] == '1':
+                        self.show_info += "True\t\t"
+                        self.write_info += "1,"
+                    else:
+                        self.show_info += "False\t\t"
+                        self.write_info += "0,"
+                if i == 3:
                     # self.show_info += self.currentTrial[i] + "\t\t"
                     self.Debug_Info.set("FP: " + self.currentTrial[i])
                     self.write_info += self.currentTrial[i] + ","
-                if i == 3:
+                if i == 4:
                     self.show_info += self.currentTrial[i]
                     self.write_info += self.currentTrial[i] + ","
 
