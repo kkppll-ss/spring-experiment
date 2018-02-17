@@ -7,7 +7,7 @@ The Python Tk GUI for Haptic Spring Project
 * playsound >= 1.2.2
 
 # Files and Directories
-* **`Produce_Read_Order_list.py`**: Produce the counter balance array for each user and randomize the pairs of `(haptic_patterns, repeated times)`.
+* **`Produce_Read_Order_list.py`**: Produce the counter balance array specified order of **`Pin height`** array for each user and randomize the pairs of **`(haptic_patterns, repeated times)`**, **`(Force Profile, Electronic Element)`**.
 * **`GUI_reorder_main.py`**: Main GUI interface of the whole system.
 * **`Play_electronic_element.py`**: Play sound module for electronic elements pronouncation.
 * `Sound`: Sounds of the electronic elements pronouncation
