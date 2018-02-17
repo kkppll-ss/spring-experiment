@@ -4,13 +4,13 @@ import time
 import Tkinter
 import tkMessageBox
 import Produce_Read_Order_list as Produce_Read_Order_List
-# from Mp3Play_electronic_element import play_electronic_element
 from Play_electronic_element import play_electronic_element
 from Tkinter import *
 import ImageTk
 import Image
 import random
 # from spring import Spring
+
 
 class Experiment_Session:
 
@@ -40,8 +40,7 @@ class Experiment_Session:
             8: 'drop'
         }
 
-        self.cmd = Produce_Read_Order_List.Produce_Read_Order_List()  # Instance of produce list of command
-        # self.cmd.make_pairs()             # Make pairs of order list [Haptic num * Repeated time]
+        self.cmd = Produce_Read_Order_List.Produce_Read_Order_List()  # Initiate list of command
 
         self.User_feel_FP = ""              # record the user's actual choice of haptic feeling
         self.global_times_counter = 0       # record the user's repeated times
@@ -60,7 +59,10 @@ class Experiment_Session:
         self.trackLength = 0                # track the length of the sound playlist
         self.write_info = ""                # Information written to output file
         self.show_info = ""                 # Information showed on the panel
-        self.pin_height = ""
+        self.pin_height = ""                # Information of the pin height
+
+        # Switch between show debug and not show
+        self.show_debug = False
 
         self.TrialInfo = Tkinter.StringVar(value='')                # Trial information
         self.Answer = Tkinter.StringVar(value='')                   # User answer
@@ -228,8 +230,9 @@ class Experiment_Session:
 
         # Show the Force Profile on left side
         self.CurrDebug = Label(self.root, text="Debug Info", textvariable=self.Debug_Info)
-        self.CurrDebug.place(x=2 * self.width / 16, y=3 * self.height / 4)
-        self.CurrDebug.config(font=("Courier", 20, "bold"), fg="red")
+        if self.show_debug:
+            self.CurrDebug.place(x=2 * self.width / 16, y=3 * self.height / 4)
+            self.CurrDebug.config(font=("Courier", 20, "bold"), fg="red")
 
         self.Choice_row_1 = Label(self.root, textvariable=self.Question_choice_row_1)
         self.Choice_row_2 = Label(self.root, textvariable=self.Question_choice_row_2)
@@ -278,8 +281,7 @@ class Experiment_Session:
                 self.cmd.read_command()           # Read commands => commands
                 # write the head information to the first line in the file
                 self.outputfile = open("Records/User_" + str(self.user_num) + "_record.txt", "w")
-                self.outputfile.write(
-                    "User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice Correctness, ask_last_num,actual electronic element,user_RL_Choice,Recognition_Load_Correctness \n")
+                self.outputfile.write("User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,actual_electronic_element,user_RL_Choice,Recognition_Load_Correctness\n")
                 self.outputfile.close()
 
             # Re-open the output file again for later record useage
@@ -434,7 +436,7 @@ class Experiment_Session:
             else:
                 if self.entry_Answer.get().strip().isdigit() and 0 < int(self.entry_Answer.get().strip()) < 9:
                     self.User_feel_FP = self.haptic_feel_lookup[int(self.entry_Answer.get())]
-                    result = tkMessageBox.askyesno(title='Notice', message='Your Haptic Choice: '+ self.User_feel_FP +'\nCan you confirm ?')
+                    result = tkMessageBox.askyesno(title='Notice', message='Your Haptic Choice: ' + self.User_feel_FP +'\nCan you confirm ?')
                     if result is True:
                         pass
                     else:
@@ -457,16 +459,16 @@ class Experiment_Session:
                     self.Question_choice_row_2.set("  3. Integrate Circuit     4. LED(light-Emitting Diode)")
                     self.Question_choice_row_3.set("  5. Resistor\t           6. Transistor")
 
-                    Base_Question_x = 19*self.width/64
-                    Base_Question_y=11*self.height/16
-                    Base_Question_y_row_1 = Base_Question_y + 30
-                    Base_Question_y_row_2 = Base_Question_y_row_1 + 30
-                    Base_Question_y_row_3 = Base_Question_y_row_2 + 30
+                    base_question_x = 19*self.width/64
+                    base_question_y = 11*self.height/16
+                    base_question_y_row_1 = base_question_y + 30
+                    base_question_y_row_2 = base_question_y_row_1 + 30
+                    base_question_y_row_3 = base_question_y_row_2 + 30
 
-                    self.Question.place(x=Base_Question_x, y=Base_Question_y, anchor=W)
-                    self.Choice_row_1.place(x=Base_Question_x, y=Base_Question_y_row_1, anchor=W)
-                    self.Choice_row_2.place(x=Base_Question_x, y=Base_Question_y_row_2, anchor=W)
-                    self.Choice_row_3.place(x=Base_Question_x, y= Base_Question_y_row_3, anchor=W)
+                    self.Question.place(x=base_question_x, y=base_question_y, anchor=W)
+                    self.Choice_row_1.place(x=base_question_x, y=base_question_y_row_1, anchor=W)
+                    self.Choice_row_2.place(x=base_question_x, y=base_question_y_row_2, anchor=W)
+                    self.Choice_row_3.place(x=base_question_x, y= base_question_y_row_3, anchor=W)
                     self.Question.config(font=("Courier", 20, "bold"), fg="red")
                     self.Choice_row_1.config(font=("Courier", 20, "bold"), fg="black")
                     self.Choice_row_2.config(font=("Courier", 20, "bold"), fg="black")
