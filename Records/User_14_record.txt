@@ -1,2 +1,4 @@
 User_num,User_name,User_age,User_gender,Trials,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice Correctness, ask_last_num,actual electronic element,user_RL_Choice,Recognition_Load_Correctness 
-14,zy,23,m,1,0,1,medium,RT06,14171,4,False,-1,-1,-1,-1
+14,zy,17,m,1,0,1,high,RT03,26965,high,True,-1,-1,-1,-1
+14,zy,17,m,2,0,1,low,RT07,7578,low,True,-1,-1,-1,-1
+14,zy,17,m,3,0,1,high,RT06,8221,high,True,-1,-1,-1,-1

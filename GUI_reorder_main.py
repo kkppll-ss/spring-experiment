@@ -39,6 +39,7 @@ class Experiment_Session:
             6: 'click',
             7: 'drop'
         }
+        self.displayFP=False
 
         self.cmd = Produce_Read_Order_List.Produce_Read_Order_List()  # Instance of produce list of command
         self.cmd.make_pairs()                                         # Make pairs of order list [Haptic num * Repeated time]
@@ -409,7 +410,8 @@ class Experiment_Session:
                 if i == 2:
                     self.write_info += self.currentTrial[i] + ","
                 #   self.show_info += self.currentTrial[i]+"\t\t    "
-                    self.Debug_Info.set("FP: " + self.currentTrial[i])
+                    if self.displayFP:
+                        self.Debug_Info.set("FP: " + self.currentTrial[i])
                 if i == 3:
                     self.show_info += self.currentTrial[i]
                     self.write_info += self.currentTrial[i] + ","
@@ -555,7 +557,8 @@ class Experiment_Session:
                         self.write_info += "0,"
                 if i == 2:
                     # self.show_info += self.currentTrial[i] + "\t\t"
-                    self.Debug_Info.set("FP: " + self.currentTrial[i])
+                    if self.displayFP:
+                        self.Debug_Info.set("FP: " + self.currentTrial[i])
                     self.write_info += self.currentTrial[i] + ","
                 if i == 3:
                     self.show_info += self.currentTrial[i]
