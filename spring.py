@@ -243,13 +243,13 @@ class Spring(threading.Thread):
 
 def main():
     spring = Spring()
-    # spring.set_profile("low", "short")
+    spring.set_profile("low", "short")
     # spring.set_profile("high", "short")
-    # pring.set_profile("medium", "short")
-    # spring.set_profile("increasing", "long")
-    # spring.set_profile("decreasing", "long")
-    # spring.set_profile("click", "long")
-    # spring.set_profile("drop", "long")
+    # spring.set_profile("medium", "short")
+    # spring.set_profile("increasing", "short")
+    # spring.set_profile("decreasing", "short")
+    # spring.set_profile("click", "short")
+    # spring.set_profile("drop", "short")
     # spring.set_profile("empty")
     spring.start()
     try:

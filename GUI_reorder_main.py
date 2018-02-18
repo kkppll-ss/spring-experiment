@@ -63,7 +63,7 @@ class Experiment_Session:
         self.pin_height = ""                # Information of the pin height
 
         # Switch between show debug and not show
-        self.show_debug = True
+        self.show_debug = False
 
         self.TrialInfo = Tkinter.StringVar(value='')                # Trial information
         self.Answer = Tkinter.StringVar(value='')                   # User answer
@@ -130,6 +130,10 @@ class Experiment_Session:
         self.buttonCancel = Tkinter.Button(self.root, text='Cancel', command=self.cancel)
         self.buttonCancel.place(x=top_col_6 + w/18, y=top_entry_y, width=w / 20, height=h / 20)
         self.buttonCancel.config(font=("Courier", 12, "bold"))
+
+        self.buttonRetry = Tkinter.Button(self.root, text='Retry', command=self.retry)
+        self.buttonRetry.place(x=top_col_6 + 2 * w/18, y=top_entry_y, width=w / 20, height=h / 20)
+        self.buttonRetry.config(font=("Courier", 12, "bold"))
 
         self.Info_Header = Label(self.root, text="Trial\tRecongition Load\tHandness\tComponent", anchor=W)
         self.Info_Header.config(font=("Courier", 12, "bold"))
@@ -398,7 +402,8 @@ class Experiment_Session:
             for i in range(len(self.currentTrial)):
                 if i == 0:
                     self.pin_height = self.currentTrial[i]
-                    self.write_info += str(self.pin_height)+","
+                    self.write_info += str(self.cmd.condition_lookup_table.index(self.pin_height))+","
+
                 if i == 1:
                     if self.currentTrial[i] == '1':
                         self.show_info += "  True\t\t"
@@ -414,7 +419,7 @@ class Experiment_Session:
                         self.show_info += "Non-Dominant\t   "
                         self.write_info += "0,"
                 if i == 3:
-                    self.write_info += self.currentTrial[i] + ","
+                    self.write_info += str(self.cmd.Force_Profile.index(self.currentTrial[i])) + ","
                     self.Debug_Info.set("FP: " + self.currentTrial[i])
                 if i == 4:
                     self.show_info += self.currentTrial[i]
@@ -507,19 +512,26 @@ class Experiment_Session:
             self.Answer.set("")
 
             self.write_info += str(self.deltatime) + ","
-            self.write_info += str(self.User_feel_FP) + ","
-            self.write_info += str(self.User_feel_FP == self.currentTrial[3]) + ","
-            self.write_info += str(self.ask_last_num) + ","
+            self.write_info += str(self.cmd.Force_Profile.index(self.User_feel_FP)) + ","
 
             if self.User_feel_FP == self.currentTrial[3]:
-                self.correct_times += 1
-                print str(self.correct_times) + "/" + str(self.global_times_counter)
-                # print self.User_feel_FP + "," + self.currentTrial[3] + "," + str(self.User_feel_FP == self.currentTrial[3])
+                self.write_info += str(1) + ","
+            else:
+                self.write_info += str(0) + ","
+
+            self.write_info += str(self.ask_last_num) + ","
+            if self.User_feel_FP == self.currentTrial[3]:
+                self.corrent_times += 1
+                print str(self.corrent_times) + "/" + str(self.global_times_counter)
+                print self.User_feel_FP + "," + self.currentTrial[3] + "," + str(self.User_feel_FP == self.currentTrial[3])
 
             if self.currentTrial[1] == '1':
                 self.write_info += str(self.play_electronic_element.last_i_th(self.ask_last_num)) + ","
                 self.write_info += str(self.user_choice) + ","
-                self.write_info += str(int(self.user_choice) == int(self.play_electronic_element.last_i_th(self.ask_last_num))) + "\n"
+                if int(self.user_choice) == int(self.play_electronic_element.last_i_th(self.ask_last_num)):
+                    self.write_info += str(1) + "\n"
+                else:
+                    self.write_info += str(0) + "\n"
             else:
                 self.write_info += str(-1) + ","
                 self.write_info += str(self.user_choice) + ","
@@ -552,7 +564,7 @@ class Experiment_Session:
             for i in range(len(self.currentTrial)):
                 if i == 0:
                     self.pin_height = self.currentTrial[i]
-                    self.write_info += str(self.pin_height) + ","
+                    self.write_info += str(self.cmd.condition_lookup_table.index(self.pin_height)) + ","
                 if i == 1:
                     if self.currentTrial[i] == '1':
                         self.show_info += "True\t\t"
@@ -562,15 +574,15 @@ class Experiment_Session:
                         self.write_info += "0,"
                 if i == 2:
                     if self.currentTrial[i] == '1':
-                        self.show_info += "True\t\t"
+                        self.show_info += "Dominant\t\t"
                         self.write_info += "1,"
                     else:
-                        self.show_info += "False\t\t"
+                        self.show_info += "Non-Dominant\t\t"
                         self.write_info += "0,"
                 if i == 3:
                     # self.show_info += self.currentTrial[i] + "\t\t"
                     self.Debug_Info.set("FP: " + self.currentTrial[i])
-                    self.write_info += self.currentTrial[i] + ","
+                    self.write_info += str(self.cmd.Force_Profile.index(self.currentTrial[i])) + ","
                 if i == 4:
                     self.show_info += self.currentTrial[i]
                     self.write_info += self.currentTrial[i] + ","
@@ -580,6 +592,104 @@ class Experiment_Session:
             self.global_times_counter += 1
             self.show_info = ""
 
+        self.EnterPressTime += 1
+
+    def retry(self):
+        # Recognition Load question answer
+        if self.currentTrial[1] == '1':
+            if len(self.entry_Answer.get()) == 0:
+                tkMessageBox.showinfo('Warning', message='Select the Electronic Element before retry')
+                return
+            else:
+                if self.entry_Answer.get().strip().isdigit() and 0 < int(self.entry_Answer.get().strip()) < 7:
+                    self.user_choice = int(self.entry_Answer.get())
+                else:
+                    tkMessageBox.showinfo(title='Notice', message='Your Choice MUST BE Integer in [1-6]')
+                    return
+            result = tkMessageBox.askyesno('Notice', message='Your Recognition Load Choice: ' + str(
+                self.user_choice) + '\nCan you confirm ?')
+            if result is True:
+                pass
+            else:
+                return
+        else:
+            self.user_choice = -1
+
+        self.Question_text.set("")
+        self.Question_choice_row_1.set("")
+        self.Question_choice_row_2.set("")
+        self.Question_choice_row_3.set("")
+        self.Answer.set("")
+
+        self.write_info += str(self.deltatime) + ","
+        self.write_info += str(self.cmd.Force_Profile.index(self.User_feel_FP)) + ","
+        if self.User_feel_FP == self.currentTrial[3]:
+            self.write_info += str(1) + ","
+        else:
+            self.write_info += str(0) + ","
+        self.write_info += str(self.ask_last_num) + ","
+        print str(self.corrent_times) + "/" + str(self.global_times_counter)
+
+        if self.currentTrial[1] == '1':
+            self.write_info += str(self.play_electronic_element.last_i_th(self.ask_last_num)) + ","
+            self.write_info += str(self.user_choice) + ","
+            if int(self.user_choice) == int(self.play_electronic_element.last_i_th(self.ask_last_num)):
+                self.write_info += str(1) + "\n"
+            else:
+                self.write_info += str(0) + "\n"
+        else:
+            self.write_info += str(-1) + ","
+            self.write_info += str(self.user_choice) + ","
+            self.write_info += str(-1) + "\n"
+
+        self.outputfile.write(self.write_info)
+        self.outputfile.flush()
+        self.write_info = ""
+
+        # Begin the next trial
+        print self.currentTrial
+        self.global_times_counter -= 1
+
+        # Current/Total times
+        self.write_info += str(self.user_num) + "," + self.user_name + "," + str(self.user_age) + "," + self.user_gender + ","
+
+        if self.startTrialNum == 0:
+            current_time = self.global_times_counter + 1
+        else:
+            current_time = self.global_times_counter + self.startTrialNum
+
+        self.show_info += str(current_time) + "\t\t"
+        self.write_info += str(current_time) + ","
+
+        for i in range(len(self.currentTrial)):
+            if i == 0:
+                self.pin_height = self.currentTrial[i]
+                self.write_info += str(self.cmd.condition_lookup_table.index(self.pin_height)) + ","
+            if i == 1:
+                if self.currentTrial[i] == '1':
+                    self.show_info += "True\t\t"
+                    self.write_info += "1,"
+                else:
+                    self.show_info += "False\t\t"
+                    self.write_info += "0,"
+            if i == 2:
+                if self.currentTrial[i] == '1':
+                    self.show_info += "Dominant\t\t"
+                    self.write_info += "1,"
+                else:
+                    self.show_info += "Non-Dominant\t\t"
+                    self.write_info += "0,"
+            if i == 3:
+                self.Debug_Info.set("FP: " + self.currentTrial[i])
+                self.write_info += str(self.cmd.Force_Profile.index(self.currentTrial[i])) + ","
+            if i == 4:
+                self.show_info += self.currentTrial[i]
+                self.write_info += self.currentTrial[i] + ","
+
+        self.PressSpaceTwice = False
+        self.TrialInfo.set(self.show_info)
+        self.show_info = ""
+        self.global_times_counter += 1
         self.EnterPressTime += 1
 
 
