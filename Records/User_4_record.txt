@@ -1,1 +1,9 @@
 User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,actual_electronic_element,user_RL_Choice,Recognition_Load_Correctness
+4,zy,16,m,1,A,0,1,drop,RT01,9226,drop,True,-1,-1,-1,-1
+4,zy,16,m,2,A,0,1,medium,RT01,7843,medium,True,-1,-1,-1,-1
+4,zy,16,m,3,A,0,1,high,RT01,5484,high,True,-1,-1,-1,-1
+4,zy,16,m,4,A,0,1,click,RT02,17213,click,True,-1,-1,-1,-1
+4,zy,16,m,5,A,0,1,medium,RT02,6738,medium,True,-1,-1,-1,-1
+4,zy,16,m,6,A,0,1,low,RT03,6870,low,True,-1,-1,-1,-1
+4,zy,16,m,7,A,0,1,increasing,RT01,7238,increasing,True,-1,-1,-1,-1
+4,zy,16,m,8,A,0,1,increasing,RT02,10902,increasing,True,-1,-1,-1,-1
