@@ -5,11 +5,12 @@ import Tkinter
 import tkMessageBox
 import Produce_Read_Order_list as Produce_Read_Order_List
 from Play_electronic_element import play_electronic_element
+from Stop_haptic_force_profile import Stop_haptic_force_profile
 from Tkinter import *
 import ImageTk
 import Image
 import random
-from spring import Spring
+# from spring import Spring
 
 
 class Experiment_Session:
@@ -39,7 +40,6 @@ class Experiment_Session:
             7: 'click',
             8: 'drop'
         }
-        self.displayFP=False
 
         self.cmd = Produce_Read_Order_List.Produce_Read_Order_List()  # Initiate list of command
 
@@ -78,7 +78,7 @@ class Experiment_Session:
         self.root.bind("<KeyPress>", self.SpaceContinue)            # Bind the [Space] press and its function
         self.root.focus_set()
         self.root.bind('<Return>', self.EnterPress)                  # Bind the [Enter] Key press
-        self.spring = Spring()
+        # self.spring = Spring()
 
         self.varNum = Tkinter.StringVar(value='')
         self.varName = Tkinter.StringVar(value='')
@@ -245,6 +245,9 @@ class Experiment_Session:
         self.entry_Answer = Tkinter.Entry(self.root, width=80, textvariable=self.Answer)
         self.entry_Answer.place(x=w/2 - w/25, y=7*h/8, width=w / 12, height=h / 25)
 
+        self.shfp = Stop_haptic_force_profile(self)
+        self.shfp.start()
+
         self.root.mainloop()
 
     def login(self):
@@ -324,59 +327,35 @@ class Experiment_Session:
         if event.keysym == "space":
             # Press [Enter] for 1,3,5,7,9
             if self.EnterPressTime == 0:
-                tkMessageBox.showinfo('Warning', message='Press [Enter] to Start a trial before proceed')
-                return
-
-            # Press Space more than twice without press [Enter]
-            if self.PressSpaceTwice is True:
-                tkMessageBox.showinfo('Warning', message='Enter the Haptic Feel before Proceed')
+                tkMessageBox.showinfo('Warning', message='Press [Enter] to start a trial before proceed')
                 return
 
             print "Space Entered"
-            if self.SpacePressTime % 2 == 0:
-                self.start = int(round(time.time() * 1000))
-                self.Question_text.set("Haptic Test START")
-                self.Question.place(x=6 * self.width / 16, y=3 * self.height / 4)
-                self.Question.config(font=("Courier", 23, "bold"))
-                self.Question.config(fg="green")
+            self.start = int(round(time.time() * 1000))
+            self.Question_text.set("Haptic Test START")
+            self.Question.place(x=6 * self.width / 16, y=3 * self.height / 4)
+            self.Question.config(font=("Courier", 23, "bold"))
+            self.Question.config(fg="green")
 
-                # Start to play the electronic element
-                if self.currentTrial[1] == '1':
-                    self.play_electronic_element = play_electronic_element()
-                    self.play_electronic_element.start()
+            # Start to play the electronic element
+            if self.currentTrial[1] == '1':
+                self.play_electronic_element = play_electronic_element()
+                self.play_electronic_element.start()
 
-                # Create thread for handling haptic Spring
-                self.spring = Spring(self.Position_Info.set)
-                self.spring.set_profile(self.currentTrial[3])
-                self.spring.start()
-            else:
-                # Stop the movement of Haptic Spring
-                self.spring.terminate()
-
-                # Stop play the sound of electronic element
-                if self.currentTrial[1] == '1':
-                    self.play_electronic_element.terminate()
-                    self.trackLength = len(self.play_electronic_element.traceList)
-
-                self.deltatime = int(round(time.time() * 1000)) - self.start
-                self.Question_text.set("Haptic Test END")
-                self.Question.place(x=7 * self.width / 16, y=3 * self.height / 4)
-                self.Question.config(fg="red", font=("Courier", 23, "bold"))
-                self.Question.after(500, lambda: self.Question_text.set(""))
-
-                self.Question.after(500, lambda: self.Question_text.set("Please Select a Haptic Feel"))
-                self.Question.place(x= 5 * self.width / 16, y=3 * self.height / 4)
-                self.Question.config(font=("Courier", 23, "bold"), fg="blue")
-                self.PressSpaceTwice = True
+            # Create thread for handling haptic Spring
+            # self.spring = Spring(self.Position_Info.set)
+            # self.spring.set_profile(self.currentTrial[2])
+            # self.spring.start()
             self.SpacePressTime += 1
 
     # [Enter] Press for 1. Show a Trial Information 2. Show a electronic elements
     def EnterPress(self, event):
 
-        # Error Handling
-        if self.user_num == -1 or self.user_name == "" or self.user_gender == "" or self.user_age == "":
-            tkMessageBox.showinfo('Warning', message='Please Complete the Personal Info before proceed')
-            return
+        # Incomplete Personal Information
+        if self.EnterPressTime == 0:
+            if self.user_num == -1 or self.user_name == "" or self.user_gender == "" or self.user_age == "":
+                tkMessageBox.showinfo('Warning', message='Complete Personal Info before proceed')
+                return
 
         # the first time press [Enter]: show a Trial Information
         if self.EnterPressTime == 0:
@@ -414,7 +393,6 @@ class Experiment_Session:
                         self.write_info += "0,"
                 if i == 3:
                     self.write_info += self.currentTrial[i] + ","
-                #   self.show_info += self.currentTrial[i]+"\t\t    "
                     self.Debug_Info.set("FP: " + self.currentTrial[i])
                 if i == 4:
                     self.show_info += self.currentTrial[i]
@@ -426,13 +404,13 @@ class Experiment_Session:
 
         elif self.EnterPressTime % 2 == 1:
 
-            # Unfinished Haptic Test
+            # Incomplete Haptic Test Start--End
             if self.PressSpaceTwice is False:
                 tkMessageBox.showinfo('Warning', message='Finish Haptic Test before proceed Press [Space]')
                 return
 
             if len(self.entry_Answer.get()) == 0:
-                tkMessageBox.showinfo('Warning', message='Enter your actual feel before proceed')
+                tkMessageBox.showinfo('Warning', message='Enter your haptic feel before proceed')
                 return
             else:
                 if self.entry_Answer.get().strip().isdigit() and 0 < int(self.entry_Answer.get().strip()) < 9:
@@ -443,7 +421,7 @@ class Experiment_Session:
                     else:
                         return
                 else:
-                    tkMessageBox.showinfo(title='Notice', message='Your Choice MUST BE Integer in [1-8]')
+                    tkMessageBox.showinfo(title='Warning', message='Your Choice MUST BE Integer in [1-8]')
                     return
 
                 self.Answer.set("")
@@ -451,11 +429,10 @@ class Experiment_Session:
                 # Show the recognition load question
                 if self.currentTrial[1] == '1':
                     self.ask_last_num = random.randrange(1, 4)  # random number for quiz of last element
-
                     if self.ask_last_num > self.trackLength:
                         self.ask_last_num = self.trackLength
 
-                    self.Question_text.set("Select the Last " + str(self.ask_last_num) + "th Electronic Element\n")
+                    self.Question_text.set("Select the Last" + str(self.ask_last_num) + " Electronic Element\n")
                     self.Question_choice_row_1.set("  1. Capacitor\t\t   2. Diode")
                     self.Question_choice_row_2.set("  3. Integrate Circuit     4. LED(light-Emitting Diode)")
                     self.Question_choice_row_3.set("  5. Resistor\t           6. Transistor")
@@ -475,6 +452,7 @@ class Experiment_Session:
                     self.Choice_row_2.config(font=("Courier", 20, "bold"), fg="black")
                     self.Choice_row_3.config(font=("Courier", 20, "bold"), fg="black")
                 else:
+                    self.ask_last_num = -1
                     self.Question_text.set("No Question just Press [Enter] to Proceed")
 
         # Write the current user trial data information to output file
@@ -483,7 +461,7 @@ class Experiment_Session:
             # Recognition Load question answer
             if self.currentTrial[1] == '1':
                 if len(self.entry_Answer.get()) == 0:
-                    tkMessageBox.showinfo('Warning', message='Select the element you hear before proceed')
+                    tkMessageBox.showinfo('Warning', message='Select the Electronic Element before proceed')
                     return
                 else:
                     if self.entry_Answer.get().strip().isdigit() and 0 < int(self.entry_Answer.get().strip()) < 7:
@@ -509,8 +487,8 @@ class Experiment_Session:
             self.write_info += str(self.deltatime) + ","
             self.write_info += str(self.User_feel_FP) + ","
             self.write_info += str(self.User_feel_FP == self.currentTrial[3]) + ","
-            print self.User_feel_FP+","+self.currentTrial[3]+","+str(self.User_feel_FP == self.currentTrial[3])
             self.write_info += str(self.ask_last_num) + ","
+            print self.User_feel_FP + "," + self.currentTrial[3] + "," + str(self.User_feel_FP == self.currentTrial[3])
 
             if self.currentTrial[1] == '1':
                 self.write_info += str(self.play_electronic_element.last_i_th(self.ask_last_num)) + ","
@@ -565,8 +543,7 @@ class Experiment_Session:
                         self.write_info += "0,"
                 if i == 3:
                     # self.show_info += self.currentTrial[i] + "\t\t"
-                    if self.displayFP:
-                        self.Debug_Info.set("FP: " + self.currentTrial[i])
+                    self.Debug_Info.set("FP: " + self.currentTrial[i])
                     self.write_info += self.currentTrial[i] + ","
                 if i == 4:
                     self.show_info += self.currentTrial[i]
