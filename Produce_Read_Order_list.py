@@ -12,9 +12,9 @@ class Produce_Read_Order_List:
         self.Handness = [0, 1]
         self.Pin_Height = [0, 1, 2]
         self.Force_Profile = ['empty', 'low', 'high', 'medium', 'increasing', 'decreasing', 'click', 'drop']
-        self.Electronic_Element = {'A': ['RT01', 'RT02', 'RT03'],
-                                   'B': ['RT04', 'RT05', 'RT06'],
-                                   'C': ['RT07', 'RT08', 'RT09']}
+        self.Electronic_Element = {'A': ['1', '2', '3'],
+                                   'B': ['4', '5', '6'],
+                                   'C': ['7', '8', '9']}
         self.read_line_counter = 0
         self.current_user_num = -1
         self.User_Condition = {}

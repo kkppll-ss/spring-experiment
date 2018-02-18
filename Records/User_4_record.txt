@@ -1,2 +1,1 @@
 User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,actual_electronic_element,user_RL_Choice,Recognition_Load_Correctness
-4,zy,16,m,1,0,1,1,3,RT02,13269,0,0,3,4,5,0

@@ -309,11 +309,11 @@ class Experiment_Session:
         self.buttonCancel.place_forget()
 
         # Show the trial information after confirmation
-        self.Info_Header.place(x=23 * self.width / 80, y=self.height / 80, width=29 * self.width / 64, height=self.height / 25)
+        self.Info_Header.place(x=23 * self.width / 80, y=self.height / 80, width=31 * self.width / 64, height=self.height / 25)
         self.Info_Header.config(bg="red", fg="white")
         self.Info_Header.config(font=("Courier", 15, "bold"))
 
-        self.Info.place(x=23 * self.width/80, y=self.height/80 + self.height/22, width=29 * self.width / 64, height=self.height/25)
+        self.Info.place(x=23 * self.width/80, y=self.height/80 + self.height/22, width=31 * self.width / 64, height=self.height/25)
         self.Info.config(font=("Courier", 15, "bold"))
         self.Info.config(bg="blue", fg="white")
 
@@ -325,6 +325,12 @@ class Experiment_Session:
 
     # Start and End a haptic trial by [Space] keypress
     def SpaceContinue(self, event):
+        if event.keysym == "Alt_R":
+            # Stop play the sound of electronic element
+            if self.currentTrial[1] == '1':
+                self.play_electronic_element.terminate()
+                self.trackLength = len(self.play_electronic_element.traceList)
+
         if event.keysym == "space":
             # Press [Enter] for 1,3,5,7,9
             if self.EnterPressTime == 0:
@@ -356,12 +362,6 @@ class Experiment_Session:
             else:
                 # Stop the movement of Haptic Spring
                 self.spring.terminate()
-
-                # Stop play the sound of electronic element
-                if self.currentTrial[1] == '1':
-                    self.play_electronic_element.terminate()
-                    self.trackLength = len(self.play_electronic_element.traceList)
-
                 self.deltatime = int(round(time.time() * 1000)) - self.start
                 self.Question_text.set("Haptic Test END")
                 self.Question.place(x=7 * self.width / 16, y=3 * self.height / 4)
@@ -413,10 +413,10 @@ class Experiment_Session:
                         self.write_info += "0,"
                 if i == 2:
                     if self.currentTrial[i] == '1':
-                        self.show_info += "Dominant\t   "
+                        self.show_info += "Dominant\t  "
                         self.write_info += "1,"
                     else:
-                        self.show_info += "Non-Dominant\t   "
+                        self.show_info += "Non-Dominant\t  "
                         self.write_info += "0,"
                 if i == 3:
                     self.write_info += str(self.cmd.Force_Profile.index(self.currentTrial[i])) + ","
@@ -459,10 +459,10 @@ class Experiment_Session:
                     if self.ask_last_num > self.trackLength:
                         self.ask_last_num = self.trackLength
 
-                    self.Question_text.set("Select the Last" + str(self.ask_last_num) + " Electronic Element\n")
-                    self.Question_choice_row_1.set("  1. Capacitor\t\t   2. Diode")
-                    self.Question_choice_row_2.set("  3. Integrate Circuit     4. LED(light-Emitting Diode)")
-                    self.Question_choice_row_3.set("  5. Resistor\t           6. Transistor")
+                    self.Question_text.set("Select the Last " + str(self.ask_last_num) + " Electronic Element\n")
+                    self.Question_choice_row_1.set("1. 光敏电阻\t2. 发光二极管\t3. 电阻")
+                    self.Question_choice_row_2.set("4. 场效应管\t5. 三极管\t6. 电容")
+                    self.Question_choice_row_3.set("7. 芯片\t\t8. 电位器\t9. 跳线")
 
                     base_question_x = 19*self.width/64
                     base_question_y = 11*self.height/16
@@ -491,7 +491,7 @@ class Experiment_Session:
                     tkMessageBox.showinfo('Warning', message='Select the Electronic Element before proceed')
                     return
                 else:
-                    if self.entry_Answer.get().strip().isdigit() and 0 < int(self.entry_Answer.get().strip()) < 7:
+                    if self.entry_Answer.get().strip().isdigit() and 0 < int(self.entry_Answer.get().strip()) < 10:
                         self.user_choice = int(self.entry_Answer.get())
                     else:
                         tkMessageBox.showinfo(title='Notice', message='Your Choice MUST BE Integer in [1-6]')
@@ -574,10 +574,10 @@ class Experiment_Session:
                         self.write_info += "0,"
                 if i == 2:
                     if self.currentTrial[i] == '1':
-                        self.show_info += "Dominant\t\t"
+                        self.show_info += "Dominant\t  "
                         self.write_info += "1,"
                     else:
-                        self.show_info += "Non-Dominant\t\t"
+                        self.show_info += "Non-Dominant\t  "
                         self.write_info += "0,"
                 if i == 3:
                     # self.show_info += self.currentTrial[i] + "\t\t"
@@ -674,10 +674,10 @@ class Experiment_Session:
                     self.write_info += "0,"
             if i == 2:
                 if self.currentTrial[i] == '1':
-                    self.show_info += "Dominant\t\t"
+                    self.show_info += "Dominant\t  "
                     self.write_info += "1,"
                 else:
-                    self.show_info += "Non-Dominant\t\t"
+                    self.show_info += "Non-Dominant\t  "
                     self.write_info += "0,"
             if i == 3:
                 self.Debug_Info.set("FP: " + self.currentTrial[i])
