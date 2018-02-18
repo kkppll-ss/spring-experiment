@@ -9,7 +9,7 @@ from Tkinter import *
 import ImageTk
 import Image
 import random
-# from spring import Spring
+from spring import Spring
 
 
 class Experiment_Session:
@@ -44,6 +44,7 @@ class Experiment_Session:
 
         self.User_feel_FP = ""              # record the user's actual choice of haptic feeling
         self.global_times_counter = 0       # record the user's repeated times
+        self.corrent_times = 0
         self.start = 0                      # Start timestamp for haptic sensing
         self.end = 0                        # End timestamp for haptic sensing
         self.deltatime = 0                  # The time duration for haptic sensing
@@ -77,7 +78,7 @@ class Experiment_Session:
         self.root.bind("<KeyPress>", self.SpaceContinue)            # Bind the [Space] press and its function
         self.root.focus_set()
         self.root.bind('<Return>', self.EnterPress)                  # Bind the [Enter] Key press
-        # self.spring = Spring()
+        self.spring = Spring()
 
         self.varNum = Tkinter.StringVar(value='')
         self.varName = Tkinter.StringVar(value='')
@@ -345,12 +346,12 @@ class Experiment_Session:
                     self.play_electronic_element.start()
 
                 # Create thread for handling haptic Spring
-                # self.spring = Spring(self.Position_Info.set)
-                # self.spring.set_profile(self.currentTrial[2])
-                # self.spring.start()
+                self.spring = Spring(self.Position_Info.set)
+                self.spring.set_profile(self.currentTrial[3])
+                self.spring.start()
             else:
                 # Stop the movement of Haptic Spring
-                # self.spring.terminate()
+                self.spring.terminate()
 
                 # Stop play the sound of electronic element
                 if self.currentTrial[1] == '1':
@@ -509,7 +510,11 @@ class Experiment_Session:
             self.write_info += str(self.User_feel_FP) + ","
             self.write_info += str(self.User_feel_FP == self.currentTrial[3]) + ","
             self.write_info += str(self.ask_last_num) + ","
-            print self.User_feel_FP + "," + self.currentTrial[3] + "," + str(self.User_feel_FP == self.currentTrial[3])
+
+            if self.User_feel_FP == self.currentTrial[3]:
+                self.corrent_times += 1
+                print self.corrent_times + "/" + self.global_times_counter
+                # print self.User_feel_FP + "," + self.currentTrial[3] + "," + str(self.User_feel_FP == self.currentTrial[3])
 
             if self.currentTrial[1] == '1':
                 self.write_info += str(self.play_electronic_element.last_i_th(self.ask_last_num)) + ","
