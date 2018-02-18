@@ -294,6 +294,7 @@ class Experiment_Session:
             self.outputfile = open("Records/User_" + str(self.user_num) + "_record.txt", "a")
         else:
             tkMessageBox.showinfo('Error', message='Please enter an valid number[0-12]')
+            return
 
         # Hide the label and entry from the panel
         self.labelNum.place_forget()
@@ -326,7 +327,7 @@ class Experiment_Session:
 
     # Start and End a haptic trial by [Space] keypress
     def SpaceContinue(self, event):
-        if event.keysym == "Alt_R":
+        if event.keysym == "n":
             # Stop play the sound of electronic element
             if self.currentTrial[1] == '1':
                 self.play_electronic_element.terminate()
