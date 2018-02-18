@@ -37,7 +37,8 @@ class Experiment_Session:
             5: 'increasing',
             6: 'decreasing',
             7: 'click',
-            8: 'drop'
+            8: 'drop',
+            9: 'None',
         }
 
         self.cmd = Produce_Read_Order_List.Produce_Read_Order_List()  # Initiate list of command
@@ -286,7 +287,7 @@ class Experiment_Session:
                 self.cmd.read_command()           # Read commands => commands
                 # write the head information to the first line in the file
                 self.outputfile = open("Records/User_" + str(self.user_num) + "_record.txt", "w")
-                self.outputfile.write("User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,actual_electronic_element,user_RL_Choice,Recognition_Load_Correctness\n")
+                self.outputfile.write("User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Handness,Force_Profile,Component_Num,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,actual_electronic_element,user_RL_Choice,Recognition_Load_Correctness\n")
                 self.outputfile.close()
 
             # Re-open the output file again for later record useage
@@ -422,7 +423,7 @@ class Experiment_Session:
                     self.write_info += str(self.cmd.Force_Profile.index(self.currentTrial[i])) + ","
                     self.Debug_Info.set("FP: " + self.currentTrial[i])
                 if i == 4:
-                    self.show_info += self.currentTrial[i]
+                    self.show_info += self.cmd.Electronic_Element_Component_lookup[self.currentTrial[i]]
                     self.write_info += self.currentTrial[i] + ","
 
             self.TrialInfo.set(self.show_info)
@@ -440,7 +441,7 @@ class Experiment_Session:
                 tkMessageBox.showinfo('Warning', message='Enter your haptic feel before proceed')
                 return
             else:
-                if self.entry_Answer.get().strip().isdigit() and 0 < int(self.entry_Answer.get().strip()) < 9:
+                if self.entry_Answer.get().strip().isdigit() and 0 < int(self.entry_Answer.get().strip()) < 10:
                     self.User_feel_FP = self.haptic_feel_lookup[int(self.entry_Answer.get())]
                     result = tkMessageBox.askyesno(title='Notice', message='Your Haptic Choice: ' + self.User_feel_FP +'\nCan you confirm ?')
                     if result is True:
@@ -448,7 +449,7 @@ class Experiment_Session:
                     else:
                         return
                 else:
-                    tkMessageBox.showinfo(title='Warning', message='Your Choice MUST BE Integer in [1-8]')
+                    tkMessageBox.showinfo(title='Warning', message='Your Choice MUST BE Integer in [1-9]')
                     return
 
                 self.Answer.set("")
@@ -494,7 +495,7 @@ class Experiment_Session:
                     if self.entry_Answer.get().strip().isdigit() and 0 < int(self.entry_Answer.get().strip()) < 10:
                         self.user_choice = int(self.entry_Answer.get())
                     else:
-                        tkMessageBox.showinfo(title='Notice', message='Your Choice MUST BE Integer in [1-6]')
+                        tkMessageBox.showinfo(title='Notice', message='Your Choice MUST BE Integer in [1-9]')
                         return
 
                 result = tkMessageBox.askyesno('Notice', message='Your Recognition Load Choice: ' + str(self.user_choice) + '\nCan you confirm ?')
@@ -512,19 +513,19 @@ class Experiment_Session:
             self.Answer.set("")
 
             self.write_info += str(self.deltatime) + ","
-            self.write_info += str(self.cmd.Force_Profile.index(self.User_feel_FP)) + ","
 
-            if self.User_feel_FP == self.currentTrial[3]:
-                self.write_info += str(1) + ","
+            if self.User_feel_FP != 'None':
+                self.write_info += str(self.cmd.Force_Profile.index(self.User_feel_FP)) + ","
+                if self.User_feel_FP == self.currentTrial[3]:
+                    self.write_info += str(1) + ","
+                    self.corrent_times += 1
+                    print str(self.corrent_times) + "/" + str(self.global_times_counter)
+                else:
+                    self.write_info += str(0) + ","
             else:
-                self.write_info += str(0) + ","
+                self.write_info += str(8) + ','
 
             self.write_info += str(self.ask_last_num) + ","
-            if self.User_feel_FP == self.currentTrial[3]:
-                self.corrent_times += 1
-                print str(self.corrent_times) + "/" + str(self.global_times_counter)
-                print self.User_feel_FP + "," + self.currentTrial[3] + "," + str(self.User_feel_FP == self.currentTrial[3])
-
             if self.currentTrial[1] == '1':
                 self.write_info += str(self.play_electronic_element.last_i_th(self.ask_last_num)) + ","
                 self.write_info += str(self.user_choice) + ","
@@ -584,7 +585,7 @@ class Experiment_Session:
                     self.Debug_Info.set("FP: " + self.currentTrial[i])
                     self.write_info += str(self.cmd.Force_Profile.index(self.currentTrial[i])) + ","
                 if i == 4:
-                    self.show_info += self.currentTrial[i]
+                    self.show_info += self.cmd.Electronic_Element_Component_lookup[self.currentTrial[i]]
                     self.write_info += self.currentTrial[i] + ","
 
             self.PressSpaceTwice = False
@@ -601,10 +602,10 @@ class Experiment_Session:
                 tkMessageBox.showinfo('Warning', message='Select the Electronic Element before retry')
                 return
             else:
-                if self.entry_Answer.get().strip().isdigit() and 0 < int(self.entry_Answer.get().strip()) < 7:
+                if self.entry_Answer.get().strip().isdigit() and 0 < int(self.entry_Answer.get().strip()) < 10:
                     self.user_choice = int(self.entry_Answer.get())
                 else:
-                    tkMessageBox.showinfo(title='Notice', message='Your Choice MUST BE Integer in [1-6]')
+                    tkMessageBox.showinfo(title='Notice', message='Your Choice MUST BE Integer in [1-9]')
                     return
             result = tkMessageBox.askyesno('Notice', message='Your Recognition Load Choice: ' + str(
                 self.user_choice) + '\nCan you confirm ?')
@@ -622,14 +623,19 @@ class Experiment_Session:
         self.Answer.set("")
 
         self.write_info += str(self.deltatime) + ","
-        self.write_info += str(self.cmd.Force_Profile.index(self.User_feel_FP)) + ","
-        if self.User_feel_FP == self.currentTrial[3]:
-            self.write_info += str(1) + ","
-        else:
-            self.write_info += str(0) + ","
-        self.write_info += str(self.ask_last_num) + ","
-        print str(self.corrent_times) + "/" + str(self.global_times_counter)
 
+        if self.User_feel_FP != 'None':
+            self.write_info += str(self.cmd.Force_Profile.index(self.User_feel_FP)) + ","
+            if self.User_feel_FP == self.currentTrial[3]:
+                self.write_info += str(1) + ","
+                self.corrent_times += 1
+                print str(self.corrent_times) + "/" + str(self.global_times_counter)
+            else:
+                self.write_info += str(0) + ","
+        else:
+            self.write_info += str(8) + ','
+
+        self.write_info += str(self.ask_last_num) + ","
         if self.currentTrial[1] == '1':
             self.write_info += str(self.play_electronic_element.last_i_th(self.ask_last_num)) + ","
             self.write_info += str(self.user_choice) + ","
@@ -683,7 +689,7 @@ class Experiment_Session:
                 self.Debug_Info.set("FP: " + self.currentTrial[i])
                 self.write_info += str(self.cmd.Force_Profile.index(self.currentTrial[i])) + ","
             if i == 4:
-                self.show_info += self.currentTrial[i]
+                self.show_info += self.cmd.Electronic_Element_Component_lookup[self.currentTrial[i]]
                 self.write_info += self.currentTrial[i] + ","
 
         self.PressSpaceTwice = False
