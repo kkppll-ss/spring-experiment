@@ -5,12 +5,11 @@ import Tkinter
 import tkMessageBox
 import Produce_Read_Order_list as Produce_Read_Order_List
 from Play_electronic_element import play_electronic_element
-from Stop_haptic_force_profile import Stop_haptic_force_profile
 from Tkinter import *
 import ImageTk
 import Image
 import random
-from spring import Spring
+# from spring import Spring
 
 
 class Experiment_Session:
@@ -245,9 +244,6 @@ class Experiment_Session:
         self.entry_Answer = Tkinter.Entry(self.root, width=80, textvariable=self.Answer)
         self.entry_Answer.place(x=w/2 - w/25, y=7*h/8, width=w / 12, height=h / 25)
 
-        self.shfp = Stop_haptic_force_profile(self)
-        self.shfp.start()
-
         self.root.mainloop()
 
     def login(self):
@@ -330,22 +326,47 @@ class Experiment_Session:
                 tkMessageBox.showinfo('Warning', message='Press [Enter] to start a trial before proceed')
                 return
 
+            # Press Space more than twice without press [Enter]
+            if self.PressSpaceTwice is True:
+                tkMessageBox.showinfo('Warning', message='Answer the question before proceed')
+                return
+
             print "Space Entered"
-            self.start = int(round(time.time() * 1000))
-            self.Question_text.set("Haptic Test START")
-            self.Question.place(x=6 * self.width / 16, y=3 * self.height / 4)
-            self.Question.config(font=("Courier", 23, "bold"))
-            self.Question.config(fg="green")
+            if self.SpacePressTime % 2 == 0:
+                self.start = int(round(time.time() * 1000))
+                self.Question_text.set("Haptic Test START")
+                self.Question.place(x=6 * self.width / 16, y=3 * self.height / 4)
+                self.Question.config(font=("Courier", 23, "bold"))
+                self.Question.config(fg="green")
 
-            # Start to play the electronic element
-            if self.currentTrial[1] == '1':
-                self.play_electronic_element = play_electronic_element()
-                self.play_electronic_element.start()
+                # Start to play the electronic element
+                if self.currentTrial[1] == '1':
+                    self.play_electronic_element = play_electronic_element()
+                    self.play_electronic_element.start()
 
-            # Create thread for handling haptic Spring
-            self.spring = Spring(self.Position_Info.set)
-            self.spring.set_profile(self.currentTrial[3])
-            self.spring.start()
+                # Create thread for handling haptic Spring
+                # self.spring = Spring(self.Position_Info.set)
+                # self.spring.set_profile(self.currentTrial[2])
+                # self.spring.start()
+            else:
+                # Stop the movement of Haptic Spring
+                # self.spring.terminate()
+
+                # Stop play the sound of electronic element
+                if self.currentTrial[1] == '1':
+                    self.play_electronic_element.terminate()
+                    self.trackLength = len(self.play_electronic_element.traceList)
+
+                self.deltatime = int(round(time.time() * 1000)) - self.start
+                self.Question_text.set("Haptic Test END")
+                self.Question.place(x=7 * self.width / 16, y=3 * self.height / 4)
+                self.Question.config(fg="red", font=("Courier", 23, "bold"))
+                self.Question.after(500, lambda: self.Question_text.set(""))
+
+                self.Question.after(500, lambda: self.Question_text.set("Select a Haptic Feel"))
+                self.Question.place(x= 5 * self.width / 16, y=3 * self.height / 4)
+                self.Question.config(font=("Courier", 23, "bold"), fg="blue")
+                self.PressSpaceTwice = True
             self.SpacePressTime += 1
 
     # [Enter] Press for 1. Show a Trial Information 2. Show a electronic elements
