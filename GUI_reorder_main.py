@@ -286,7 +286,7 @@ class Experiment_Session:
                 self.cmd.read_command()           # Read commands => commands
                 # write the head information to the first line in the file
                 self.outputfile = open("Records/User_" + str(self.user_num) + "_record.txt", "w")
-                self.outputfile.write("User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,actual_electronic_element,user_RL_Choice,Recognition_Load_Correctness\n")
+                self.outputfile.write("User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Handness,Force_Profile,Component_Num,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,actual_electronic_element,user_RL_Choice,Recognition_Load_Correctness\n")
                 self.outputfile.close()
 
             # Re-open the output file again for later record useage
@@ -422,7 +422,7 @@ class Experiment_Session:
                     self.write_info += str(self.cmd.Force_Profile.index(self.currentTrial[i])) + ","
                     self.Debug_Info.set("FP: " + self.currentTrial[i])
                 if i == 4:
-                    self.show_info += self.currentTrial[i]
+                    self.show_info += self.cmd.Electronic_Element_Component_lookup[self.currentTrial[i]]
                     self.write_info += self.currentTrial[i] + ","
 
             self.TrialInfo.set(self.show_info)
@@ -584,7 +584,7 @@ class Experiment_Session:
                     self.Debug_Info.set("FP: " + self.currentTrial[i])
                     self.write_info += str(self.cmd.Force_Profile.index(self.currentTrial[i])) + ","
                 if i == 4:
-                    self.show_info += self.currentTrial[i]
+                    self.show_info += self.cmd.Electronic_Element_Component_lookup[self.currentTrial[i]]
                     self.write_info += self.currentTrial[i] + ","
 
             self.PressSpaceTwice = False
@@ -683,7 +683,7 @@ class Experiment_Session:
                 self.Debug_Info.set("FP: " + self.currentTrial[i])
                 self.write_info += str(self.cmd.Force_Profile.index(self.currentTrial[i])) + ","
             if i == 4:
-                self.show_info += self.currentTrial[i]
+                self.show_info += self.cmd.Electronic_Element_Component_lookup[self.currentTrial[i]]
                 self.write_info += self.currentTrial[i] + ","
 
         self.PressSpaceTwice = False
