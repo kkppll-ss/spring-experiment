@@ -15,6 +15,17 @@ class Produce_Read_Order_List:
         self.Electronic_Element = {'A': ['1', '2', '3'],
                                    'B': ['4', '5', '6'],
                                    'C': ['7', '8', '9']}
+        self.Electronic_Element_Component_lookup = {
+            '1': '光敏电阻',
+            '2': '发光二极管',
+            '3': '电阻',
+            '4': '场效应管',
+            '5': '三极管',
+            '6': '电容',
+            '7': '芯片',
+            '8': '电位器',
+            '9': '跳线',
+        }
         self.read_line_counter = 0
         self.current_user_num = -1
         self.User_Condition = {}
