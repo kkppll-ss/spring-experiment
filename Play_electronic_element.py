@@ -2,8 +2,7 @@
 
 import threading
 import random
-from playsound import playsound
-import time
+import pygame
 
 
 class play_electronic_element(threading.Thread):
@@ -22,12 +21,17 @@ class play_electronic_element(threading.Thread):
                               'transistor'
                             ]
 
+        pygame.init()
+        pygame.mixer.init()
+        pygame.display.set_mode([1, 1])
+
     def run(self):
         while self.stop is False:
-            self.currentElectronicElement = random.randrange(1, 6)
+            self.currentElectronicElement = random.randrange(1, 7)
             self.traceList.append(self.currentElectronicElement)
-            playsound("sound/"+self.sound_list[self.currentElectronicElement - 1]+".mp3")
-            time.sleep(1)
+            pygame.mixer.music.load("sound/" + self.sound_list[self.currentElectronicElement - 1] + ".mp3")
+            pygame.mixer.music.play()
+            pygame.time.delay(2000)
 
     def terminate(self, stop=1):
         if stop == 1:
@@ -37,15 +41,12 @@ class play_electronic_element(threading.Thread):
         return self.traceList[-last_i_th]
 
 
-# music_play = play_electronic_element()
-# music_play.start()
+music_play = play_electronic_element()
+music_play.start()
 # a = int(raw_input())
 # music_play.terminate(a)
 # print "The last 2 electronic element hear of: " + str(music_play.last_i_th(2))
 # print music_play.traceList
-
-# print "The Last element" + str(music_play.currentElectronicElement + 1)
-# print "Hello all sound terminated"
 
 
 
