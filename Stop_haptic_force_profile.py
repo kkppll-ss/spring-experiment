@@ -22,7 +22,7 @@ class Stop_haptic_force_profile(threading.Thread):
             #         self.num = 4
             print "I am running %s" % self.Spring_GUI.Position_Info.get()
             cur_pos = self.Spring_GUI.Position_Info.get()
-            if cur:
+            if cur_pos:
                 cur = float(cur_pos)
                 if abs(cur) < 0.0001 and self.pre > 0.0001:
                     # Stop the movement of Haptic Spring
