@@ -215,7 +215,7 @@ class Spring(threading.Thread):
                 self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=10, right_point=20, width=2)
         elif profile == "drop":
             if length != "short":
-                self._set_parameters("step", k1=80, k2=3, step_point=10)
+                self._set_parameters("step", k1=150, k2=3, step_point=10)
             else:
                 self._set_parameters("step", k1=200, k2=3, step_point=5)
 
@@ -243,10 +243,10 @@ def main():
     # spring.set_profile("low", "middle")
     # spring.set_profile("high", "middle")
     # spring.set_profile("medium", "middle")
-    # spring.set_profile("increasing", "long")
-    # spring.set_profile("decreasing", "long")
-    # spring.set_profile("click", "long")
-    spring.set_profile("drop", "long")
+    # spring.set_profile("increasing", "middle")
+    # spring.set_profile("decreasing", "middle")
+    # spring.set_profile("click", "middle")
+    # spring.set_profile("drop", "middle")
     # spring.set_profile("empty")
     spring.start()
     try:

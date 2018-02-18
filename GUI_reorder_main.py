@@ -9,7 +9,7 @@ from Tkinter import *
 import ImageTk
 import Image
 import random
-# from spring import Spring
+from spring import Spring
 
 
 class Experiment_Session:
@@ -78,7 +78,7 @@ class Experiment_Session:
         self.root.bind("<KeyPress>", self.SpaceContinue)            # Bind the [Space] press and its function
         self.root.focus_set()
         self.root.bind('<Return>', self.EnterPress)                  # Bind the [Enter] Key press
-        # self.spring = Spring()
+        self.spring = Spring()
 
         self.varNum = Tkinter.StringVar(value='')
         self.varName = Tkinter.StringVar(value='')
@@ -346,12 +346,12 @@ class Experiment_Session:
                     self.play_electronic_element.start()
 
                 # Create thread for handling haptic Spring
-                # self.spring = Spring(self.Position_Info.set)
-                # self.spring.set_profile(self.currentTrial[2])
-                # self.spring.start()
+                self.spring = Spring(self.Position_Info.set)
+                self.spring.set_profile(self.currentTrial[3])
+                self.spring.start()
             else:
                 # Stop the movement of Haptic Spring
-                # self.spring.terminate()
+                self.spring.terminate()
 
                 # Stop play the sound of electronic element
                 if self.currentTrial[1] == '1':
