@@ -209,8 +209,11 @@ class Spring(threading.Thread):
             elif length == "short":
                 self._set_parameters("linear", k1=50, k2=20, left_point=0, right_point=15)
         elif profile == "click":
-            if length == "long" or length == "middle":
+            if length == "long":
+                self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=30, right_point=50, width=5)
+            elif length == "middle":
                 self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=20, right_point=40, width=5)
+
             elif length == "short":
                 self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=10, right_point=20, width=2)
         elif profile == "drop":
@@ -240,13 +243,13 @@ class Spring(threading.Thread):
 
 def main():
     spring = Spring()
-    # spring.set_profile("low", "middle")
-    # spring.set_profile("high", "middle")
-    # spring.set_profile("medium", "middle")
-    # spring.set_profile("increasing", "middle")
-    # spring.set_profile("decreasing", "middle")
-    # spring.set_profile("click", "middle")
-    # spring.set_profile("drop", "middle")
+    # spring.set_profile("low", "short")
+    # spring.set_profile("high", "short")
+    # pring.set_profile("medium", "short")
+    # spring.set_profile("increasing", "long")
+    # spring.set_profile("decreasing", "long")
+    # spring.set_profile("click", "long")
+    # spring.set_profile("drop", "long")
     # spring.set_profile("empty")
     spring.start()
     try:

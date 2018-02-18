@@ -3,7 +3,7 @@
 import time
 import threading
 import random
-import pygame
+import vlc
 
 
 class play_electronic_element(threading.Thread):
@@ -22,22 +22,15 @@ class play_electronic_element(threading.Thread):
                               'transistor'
                             ]
         # self.set_label = set_Position_label
-
-        pygame.init()
-        pygame.mixer.init()
-        pygame.display.set_mode([1, 1])
-
-        pygame.init()
-        pygame.mixer.init()
-        pygame.display.set_mode([1, 1])
-
+        
     def run(self):
         while self.stop is False:
             self.currentElectronicElement = random.randrange(1, 7)
             self.traceList.append(self.currentElectronicElement)
-            pygame.mixer.music.load("sound/" + self.sound_list[self.currentElectronicElement - 1] + ".mp3")
-            pygame.mixer.music.play()
-            pygame.time.delay(2000)
+            p = vlc.MediaPlayer("sound/" + self.sound_list[self.currentElectronicElement - 1] + ".mp3")
+            p.play()
+            time.sleep(2)
+            p.stop()
 
     def terminate(self, stop=1):
         if stop == 1:

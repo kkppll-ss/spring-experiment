@@ -1,3 +1,1 @@
 User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,actual_electronic_element,user_RL_Choice,Recognition_Load_Correctness
-4,zy,16,m,1,A,1,0,medium,RT03,32954,medium,True,3,5,3,False
-4,zy,16,m,2,A,1,0,increasing,RT03,17920,high,False,3,2,4,False
