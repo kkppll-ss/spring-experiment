@@ -44,6 +44,7 @@ class Experiment_Session:
 
         self.User_feel_FP = ""              # record the user's actual choice of haptic feeling
         self.global_times_counter = 0       # record the user's repeated times
+        self.corrent_times = 0
         self.start = 0                      # Start timestamp for haptic sensing
         self.end = 0                        # End timestamp for haptic sensing
         self.deltatime = 0                  # The time duration for haptic sensing
@@ -509,7 +510,11 @@ class Experiment_Session:
             self.write_info += str(self.User_feel_FP) + ","
             self.write_info += str(self.User_feel_FP == self.currentTrial[3]) + ","
             self.write_info += str(self.ask_last_num) + ","
-            print self.User_feel_FP + "," + self.currentTrial[3] + "," + str(self.User_feel_FP == self.currentTrial[3])
+
+            if self.User_feel_FP == self.currentTrial[3]:
+                self.corrent_times += 1
+                print self.corrent_times + "/" + self.global_times_counter
+                # print self.User_feel_FP + "," + self.currentTrial[3] + "," + str(self.User_feel_FP == self.currentTrial[3])
 
             if self.currentTrial[1] == '1':
                 self.write_info += str(self.play_electronic_element.last_i_th(self.ask_last_num)) + ","
