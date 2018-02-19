@@ -356,11 +356,6 @@ class Experiment_Session:
                 if self.currentTrial[1] == '1':
                     self.play_electronic_element = play_electronic_element()
                     self.play_electronic_element.start()
-
-                # Create thread for handling haptic Spring
-                self.spring = Spring(self.Position_Info.set)
-                self.spring.set_profile(self.currentTrial[3])
-                self.spring.start()
             else:
                 # Stop the movement of Haptic Spring
                 self.spring.terminate()
@@ -430,6 +425,17 @@ class Experiment_Session:
             self.TrialInfo.set(self.show_info)
             self.global_times_counter += 1
             self.show_info = ""
+
+            # Create thread for handling haptic Spring
+            self.spring = Spring(self.Position_Info.set)
+            Pin_height = int(self.currentTrial[4])
+            if 1 <= Pin_height and Pin_height <=3:
+                self.spring.set_profile(self.currentTrial[3], 'long')
+            elif 4 <= Pin_height and Pin_height <=6:
+                self.spring.set_profile(self.currentTrial[3], 'middle')
+            elif 7 <= Pin_height and Pin_height <= 9:
+                self.spring.set_profile(self.currentTrial[3], 'short')
+            self.spring.start()
 
         elif self.EnterPressTime % 2 == 1:
 
@@ -595,6 +601,17 @@ class Experiment_Session:
             self.global_times_counter += 1
             self.show_info = ""
 
+            # Create thread for handling haptic Spring
+            self.spring = Spring(self.Position_Info.set)
+            Pin_height = int(self.currentTrial[4])
+            if 1 <= Pin_height and Pin_height <=3:
+                self.spring.set_profile(self.currentTrial[3], 'long')
+            elif 4 <= Pin_height and Pin_height <=6:
+                self.spring.set_profile(self.currentTrial[3], 'middle')
+            elif 7 <= Pin_height and Pin_height <= 9:
+                self.spring.set_profile(self.currentTrial[3], 'short')
+            self.spring.start()
+
         self.EnterPressTime += 1
 
     def retry(self):
@@ -699,6 +716,17 @@ class Experiment_Session:
         self.show_info = ""
         self.global_times_counter += 1
         self.EnterPressTime += 1
+
+        # Create thread for handling haptic Spring
+        self.spring = Spring(self.Position_Info.set)
+        Pin_height = int(self.currentTrial[4])
+        if 1 <= Pin_height and Pin_height <= 3:
+            self.spring.set_profile(self.currentTrial[3], 'long')
+        elif 4 <= Pin_height and Pin_height <= 6:
+            self.spring.set_profile(self.currentTrial[3], 'middle')
+        elif 7 <= Pin_height and Pin_height <= 9:
+            self.spring.set_profile(self.currentTrial[3], 'short')
+        self.spring.start()
 
 
 if __name__ == "__main__":
