@@ -106,9 +106,10 @@ class Spring(threading.Thread):
                                     logging.info("at %s, send x %d", now, x)
                                     self.prev_x = x
                             else:
-                                x = self.position
-                                self.ser.write((str(x) + "s").encode())
-                                logging.info("at %s, send x %d", now, x)
+                                if abs(proximity - self.position) >= 5:
+                                    x = self.position
+                                    self.ser.write((str(x) + "s").encode())
+                                    logging.info("at %s, send x %d", now, x)
                             self.last_time = now
                     except UnicodeDecodeError:
                         pass
@@ -243,14 +244,14 @@ class Spring(threading.Thread):
 
 def main():
     spring = Spring()
-    spring.set_profile("low", "short")
+    # spring.set_profile("low", "short")
     # spring.set_profile("high", "short")
     # spring.set_profile("medium", "short")
     # spring.set_profile("increasing", "short")
     # spring.set_profile("decreasing", "short")
     # spring.set_profile("click", "short")
     # spring.set_profile("drop", "short")
-    # spring.set_profile("empty")
+    spring.set_profile("empty")
     spring.start()
     try:
         while spring.is_alive:
