@@ -1,1 +1,2 @@
-User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,actual_electronic_element,user_RL_Choice,Recognition_Load_Correctness
+User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Handness,Force_Profile,Component_Num,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,actual_electronic_element,user_RL_Choice,Recognition_Load_Correctness
+4,zy,176,m,1,0,0,1,7,1,9490,8,-1,-1,-1,-1

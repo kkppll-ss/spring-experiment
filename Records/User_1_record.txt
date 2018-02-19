@@ -1,0 +1,12 @@
+User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Handness,Force_Profile,Component_Num,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,actual_electronic_element,user_RL_Choice,Recognition_Load_Correctness
+1,zy,21,m,1,2,1,0,5,8,10638,5,1,2,1,5,0
+1,zy,21,m,2,2,1,0,4,9,9724,3,0,1,5,7,0
+1,zy,21,m,3,2,1,0,0,9,18423,0,1,2,2,2,1
+1,zy,21,m,4,2,1,0,3,8,17804,3,1,2,4,7,0
+1,zy,21,m,5,2,1,0,0,7,6855,0,1,2,2,2,1
+1,zy,21,m,6,2,1,0,0,8,20783,1,0,1,2,5,0
+1,zy,21,m,7,2,1,0,5,7,322870,5,1,1,4,5,0
+1,zy,21,m,8,2,1,0,7,7,5495,7,1,1,4,4,1
+1,zy,21,m,9,2,1,0,1,7,8693,8,1,5,9,0
+1,zy,21,m,9,2,1,0,1,7,7174,8,1,2,8,0
+1,zy,21,m,9,2,1,0,1,7,27502,2,0,1,4,5,0

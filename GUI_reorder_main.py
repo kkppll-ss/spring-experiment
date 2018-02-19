@@ -311,11 +311,11 @@ class Experiment_Session:
         self.buttonCancel.place_forget()
 
         # Show the trial information after confirmation
-        self.Info_Header.place(x=23 * self.width / 80, y=self.height / 80, width=31 * self.width / 64, height=self.height / 25)
+        self.Info_Header.place(x=20 * self.width / 80, y=self.height / 80, width=34 * self.width / 64, height=self.height / 25)
         self.Info_Header.config(bg="red", fg="white")
         self.Info_Header.config(font=("Courier", 15, "bold"))
 
-        self.Info.place(x=23 * self.width/80, y=self.height/80 + self.height/22, width=31 * self.width / 64, height=self.height/25)
+        self.Info.place(x=20 * self.width/80, y=self.height/80 + self.height/22, width=34 * self.width / 64, height=self.height/25)
         self.Info.config(font=("Courier", 15, "bold"))
         self.Info.config(bg="blue", fg="white")
 
@@ -519,12 +519,13 @@ class Experiment_Session:
                 self.write_info += str(self.cmd.Force_Profile.index(self.User_feel_FP)) + ","
                 if self.User_feel_FP == self.currentTrial[3]:
                     self.write_info += str(1) + ","
-                    self.corrent_times += 1
-                    print str(self.corrent_times) + "/" + str(self.global_times_counter)
+                    self.correct_times += 1
                 else:
                     self.write_info += str(0) + ","
             else:
                 self.write_info += str(8) + ','
+            print "Actual FP: " + self.currentTrial[3] + " User FP: "  + self.User_feel_FP
+            print str(self.correct_times) + "/" + str(self.global_times_counter)
 
             self.write_info += str(self.ask_last_num) + ","
             if self.currentTrial[1] == '1':
@@ -629,8 +630,8 @@ class Experiment_Session:
             self.write_info += str(self.cmd.Force_Profile.index(self.User_feel_FP)) + ","
             if self.User_feel_FP == self.currentTrial[3]:
                 self.write_info += str(1) + ","
-                self.corrent_times += 1
-                print str(self.corrent_times) + "/" + str(self.global_times_counter)
+                self.correct_times += 1
+                print str(self.correct_times) + "/" + str(self.global_times_counter)
             else:
                 self.write_info += str(0) + ","
         else:
