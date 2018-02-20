@@ -1,4 +1,4 @@
-  # -*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 
 import random
 
@@ -9,9 +9,8 @@ class Produce_Read_Order_List:
     def __init__(self):
         self.Commands = []
         self.Cognitive_Load = [0, 1]
-        self.Handness = [0, 1]
         self.Pin_Height = [0, 1, 2]
-        self.Force_Profile = ['empty', 'low', 'high', 'medium', 'increasing', 'decreasing', 'click', 'drop']
+        self.Force_Profile = ['empty', 'low', 'high', 'medium', 'click', 'drop']
         self.Electronic_Element = {'A': ['1', '2', '3'],
                                    'B': ['4', '5', '6'],
                                    'C': ['7', '8', '9']}
@@ -73,9 +72,9 @@ class Produce_Read_Order_List:
         force_profile_electronic_component = {}
         force_profile_electronic_component_list = {}
 
-        # cognitive_load_handness pairs 2x2
-        # cognitive_load_handness pairs list 3x2x2 
-        cognitive_load_handness = self.make_pairs(self.Cognitive_Load, self.Handness)
+        # cognitive pairs 2
+        # cognitive list 3x2
+        cognitive_load_handness = self.Cognitive_Load
         cognitive_load_handness_pairs_list = [cognitive_load_handness[:], cognitive_load_handness[:], cognitive_load_handness[:]]
 
         # force_profile_electronic_component pairs 8x3
@@ -87,20 +86,20 @@ class Produce_Read_Order_List:
             force_profile_electronic_component_list[i] = [force_profile_electronic_component[i][:], force_profile_electronic_component[i][:], force_profile_electronic_component[i][:], force_profile_electronic_component[i][:]]
 
         f = open("Order_List/User_" + str(self.current_user_num) + "_order_list.txt", "w")
-        header = "Pin Height,Recognition_Load,Handness,Force_Profile,Electronic_Component\n"
+        header = "Pin Height,Recognition_Load,Force_Profile,Electronic_Component\n"
         f.write(header)
 
         for i in range(len(pin_condition_order)):
             c = 3
             while len(cognitive_load_handness_pairs_list[i]) != 0:
                 index_clh = random.randrange(len(cognitive_load_handness_pairs_list[i]))
-                cognitive_load_handness_pair = cognitive_load_handness_pairs_list[i][index_clh]
+                cognitive_load_handness = cognitive_load_handness_pairs_list[i][index_clh]
 
                 fp_ec = force_profile_electronic_component_list[pin_condition_order[i]][c]
                 while len(fp_ec) != 0:
                     index_fp_ec = random.randrange(len(fp_ec))
                     force_profile_electronic_component_pair = fp_ec[index_fp_ec]
-                    f.write(str(pin_condition_order[i]) + "," + str(cognitive_load_handness_pair[0]) + "," + str(cognitive_load_handness_pair[1]) + "," + str(force_profile_electronic_component_pair[0]) + "," + str(force_profile_electronic_component_pair[1]))
+                    f.write(str(pin_condition_order[i]) + "," + str(cognitive_load_handness) + "," + str(force_profile_electronic_component_pair[0]) + "," + str(force_profile_electronic_component_pair[1]))
                     f.write("\n")
                     fp_ec.pop(index_fp_ec)
 

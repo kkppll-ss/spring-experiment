@@ -10,7 +10,7 @@ import csv
 
 
 class Spring(threading.Thread):
-    def __init__(self, callback=None):
+    def __init__(self, timer_starter=None, sound_stopper=None):
         threading.Thread.__init__(self)
         logging.basicConfig(level=logging.DEBUG, filename="spring.log", filemode="w")
         available_ports = list(list_ports.grep('/dev/tty', include_links=True))
@@ -19,7 +19,8 @@ class Spring(threading.Thread):
         print "available ports {}, choose port {}".format([port.device for port in available_ports], available_ports[0].device)
         self.ser = Serial(available_ports[0].device, baudrate=115200)
 
-        self.callback = callback
+        self.timer_starter = timer_starter
+        self.sound_stopper = sound_stopper
 
         self.x = 0
         self.prev_x = 0
@@ -37,6 +38,7 @@ class Spring(threading.Thread):
         self.right_point = None
         self.step_point = None
         self.profile = None
+        self.length = None
         self.width = None
         self.position = None
 
@@ -63,6 +65,16 @@ class Spring(threading.Thread):
         self.ode_solver.set_integrator("dopri5")
         self.ode_solver.set_initial_value([0, 0], 0)
 
+        self.state = "init"
+    
+    def should_stop(self, proximity):
+        if self.profile != "empty" and self.profile != "high":
+            return (self.length == "long" and proximity > 100) or (self.length == "middle" and proximity > 60) or (self.profile == "short" and proximity > 30) or proximity < 3 and self.average_force < 0.01
+        elif self.profile == "high":
+            return self.average_force < 0.01
+        else:
+            return proximity > 75
+
     def run(self):
         while not self.terminate_event.is_set():
             num = self.ser.in_waiting
@@ -79,8 +91,7 @@ class Spring(threading.Thread):
                             force_sensor, setpoint, proximity, output = value.split()
                             force_sensor, proximity = int(force_sensor), float(proximity)
                             setpoint, output = float(setpoint), float(output)
-                            if self.callback:
-                                self.callback("%0.3f" % setpoint)
+
                             if self.last_time:
                                 delta_time = now - self.last_time
                                 self.estimated_delta_time = 0.8 * self.estimated_delta_time + 0.2 * delta_time
@@ -88,12 +99,23 @@ class Spring(threading.Thread):
                             #         1000 * (10240 - 10 * force_sensor) ** 1.32)
                             force = 9.7 * force_sensor / (1024 - force_sensor)
                             if self.average_force:
-                                self.average_force = 0.95 * self.average_force + 0.05 * force
+                                self.average_force = 0.9 * self.average_force + 0.1 * force
                             else:
                                 self.average_force = force
+                            if self.state == "init" and self.average_force > 0.01:
+                                if self.timer_starter:
+                                    self.timer_starter()
+                                logging.info("proximity %0.3f, force %0.3f moving", proximity, self.average_force)
+                                self.state = "moving"
+                            elif self.state == "moving" and self.should_stop(proximity):
+                                if self.sound_stopper:
+                                    self.sound_stopper()
+                                logging.info("proximity %0.3f, force %0.3f stop", proximity, self.average_force)
+                                self.state = "init"
+                                
                             logging.info("sensor: %d force: %0.2f average: %0.2f"
                                          , force_sensor, force, self.average_force)
-                            if self.profile != "fixed":
+                            if self.profile != "empty" and self.profile != "high":
                                 x_to_k = int(round(self.x * 1000))
                                 k, damping = self._get_k(x_to_k)
                                 self._apply_f(self.average_force, k, damping)
@@ -104,10 +126,16 @@ class Spring(threading.Thread):
                                 self.ser.write((str(x) + "s").encode())
                                 logging.info("at %s, send x %d", now, x)
                                 self.prev_x = x
+                            elif self.profile == "high":
+                                x = self.position
+                                self.ser.write((str(x) + "s").encode())
+                                self.writer.writerow([now, self.average_force, x, x, setpoint, proximity, 0, output])
+                                logging.info("at %s, send x %d", now, x)
                             else:
-                                if abs(proximity - self.position) >= 5:
+                                if self.average_force >= 0.01 and abs(proximity) < 5:
                                     x = self.position
                                     self.ser.write((str(x) + "s").encode())
+                                    self.writer.writerow([now, self.average_force, x, x, setpoint, proximity, 0, output])
                                     logging.info("at %s, send x %d", now, x)
                             self.last_time = now
                     except UnicodeDecodeError:
@@ -129,14 +157,8 @@ class Spring(threading.Thread):
 
         if profile == "constant":
             self.k = k1
-        elif profile == 'fixed':
+        elif profile == 'high' or profile == "empty":
             self.position = position
-        # elif profile == 'linear':
-        #     self.left_point = left_point
-        #     self.right_point = right_point
-        #     self.rate = float(k2 - k1) / (right_point - left_point)
-        #     self.k1 = k1
-        #     self.k2 = k2
         elif profile == "pseudo_click":
             self.k1 = k1
             self.k2 = k2
@@ -156,13 +178,6 @@ class Spring(threading.Thread):
         k = None
         if self.profile == 'constant':
             k = self.k
-        # elif self.profile == 'linear':
-        #     if x < self.left_point:
-        #         k = self.k1
-        #     elif x < self.right_point:
-        #         k = self.rate * (x - self.left_point) + self.k1
-        #     else:
-        #         k = self.k2
         elif self.profile == "pseudo_click":
             if x < self.left_point:
                 k = self.k1
@@ -185,42 +200,31 @@ class Spring(threading.Thread):
 
     def set_profile(self, profile, length="long"):
         self.profile = profile
+        self.length = length
         if profile == "low":
-            self._set_parameters("constant", k1=3)
+            self._set_parameters("constant", k1=1)
         elif profile == "medium":
             if length == "short":
-                self._set_parameters("constant", k1=25)
+                self._set_parameters("constant", k1=15)
             else:
-                self._set_parameters("constant", k1=25)
+                self._set_parameters("constant", k1=15)
         elif profile == "empty":
-            self._set_parameters("fixed", position=70)
+            self._set_parameters("empty", position=80)
         elif profile == "high":
-            self._set_parameters("fixed", position=0)
-        # elif profile == "increasing":
-        #     if length == "long" or length == "middle":
-        #         self._set_parameters("step", k1=5, k2=50, step_point=15)
-        #     elif length == "short":
-        #         self._set_parameters("step", k1=5, k2=50, step_point=15)
-        # elif profile == "decreasing":
-        #     if length == "long":
-        #         self._set_parameters("linear", k1=50, k2=13, left_point=0, right_point=60)
-        #     elif length == "middle":
-        #         self._set_parameters("linear", k1=50, k2=13, left_point=0, right_point=30)
-        #     elif length == "short":
-        #         self._set_parameters("linear", k1=50, k2=20, left_point=0, right_point=15)
+            self._set_parameters("high", position=0)
         elif profile == "click":
             if length == "long":
-                self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=25, right_point=45, width=5)
+                self._set_parameters("pseudo_click", k1=1, k2=15, k3=1, left_point=30, right_point=50, width=0)
             elif length == "middle":
-                self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=20, right_point=40, width=5)
+                self._set_parameters("pseudo_click", k1=1, k2=15, k3=1, left_point=20, right_point=40, width=0)
 
             elif length == "short":
-                self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=10, right_point=20, width=2)
+                self._set_parameters("pseudo_click", k1=1, k2=15, k3=1, left_point=10, right_point=20, width=0)
         elif profile == "drop":
             if length != "short":
-                self._set_parameters("step", k1=150, k2=3, step_point=10)
+                self._set_parameters("step", k1=80, k2=1, step_point=10)
             else:
-                self._set_parameters("step", k1=200, k2=3, step_point=5)
+                self._set_parameters("step", k1=80, k2=1, step_point=5)
 
         else:
             raise ValueError("unknown profile name '{}'".format(profile))
@@ -243,11 +247,9 @@ class Spring(threading.Thread):
 
 def main():
     spring = Spring()
-    # spring.set_profile("low", "short")
+    spring.set_profile("low", "short")
     # spring.set_profile("high", "short")
     # spring.set_profile("medium", "short")
-    spring.set_profile("increasing", "long")
-    # spring.set_profile("decreasing", "long")
     # spring.set_profile("click", "long")
     # spring.set_profile("drop", "long")
     # spring.set_profile("empty")
