@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+  # -*- coding: UTF-8 -*-
 
 import random
 
@@ -74,7 +74,7 @@ class Produce_Read_Order_List:
         force_profile_electronic_component_list = {}
 
         # cognitive_load_handness pairs 2x2
-        # cognitive_load_handness pairs list 3x2x2
+        # cognitive_load_handness pairs list 3x2x2 
         cognitive_load_handness = self.make_pairs(self.Cognitive_Load, self.Handness)
         cognitive_load_handness_pairs_list = [cognitive_load_handness[:], cognitive_load_handness[:], cognitive_load_handness[:]]
 

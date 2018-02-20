@@ -21,7 +21,7 @@ class play_electronic_element(threading.Thread):
             self.traceList.append(self.currentElectronicElement)
             p = vlc.MediaPlayer("sound/" + "0" + str(self.currentElectronicElement) + ".mp3")
             p.play()
-            time.sleep(2)
+            time.sleep(1)
             p.stop()
 
     def terminate(self, stop=1):

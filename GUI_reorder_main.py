@@ -18,8 +18,8 @@ class Experiment_Session:
         # Set the basic params of windows
         self.root = Tkinter.Tk()
         self.root.title("Haptic Experiment")
-        w = self.root.winfo_screenwidth()
-        h = self.root.winfo_screenheight()
+        w = 1920   #self.root.winfo_screenwidth()
+        h = 1080   #self.root.winfo_screenheight()
         self.width = w
         self.height = h
         self.root.geometry("%dx%d" % (w, h))
@@ -46,6 +46,8 @@ class Experiment_Session:
         self.User_feel_FP = ""              # record the user's actual choice of haptic feeling
         self.global_times_counter = 0       # record the user's repeated times
         self.correct_times = 0
+        self.correct_RL_times = 0
+        self.RL_total = 0
         self.start = 0                      # Start timestamp for haptic sensing
         self.end = 0                        # End timestamp for haptic sensing
         self.deltatime = 0                  # The time duration for haptic sensing
@@ -327,7 +329,7 @@ class Experiment_Session:
 
     # Start and End a haptic trial by [Space] keypress
     def SpaceContinue(self, event):
-        if event.keysym == "n":
+        if event.keysym == "Right":
             # Stop play the sound of electronic element
             if self.currentTrial[1] == '1':
                 self.play_electronic_element.terminate()
@@ -382,7 +384,16 @@ class Experiment_Session:
 
         # the first time press [Enter]: show a Trial Information
         if self.EnterPressTime == 0:
-            self.currentTrial = self.cmd.read_command_by_line()
+
+            start_num = self.startTrialNum
+
+            if start_num == 0:
+                self.currentTrial = self.cmd.read_command_by_line()
+
+            while start_num != 0:
+                self.currentTrial = self.cmd.read_command_by_line()
+                start_num -= 1
+
             print self.currentTrial
 
             # Current/Total times
@@ -427,7 +438,8 @@ class Experiment_Session:
             self.show_info = ""
 
             # Create thread for handling haptic Spring
-            self.spring = Spring(self.Position_Info.set)
+            #self.spring = Spring(self.Position_Info.set)
+            self.spring = Spring()
             Pin_height = int(self.currentTrial[4])
             if 1 <= Pin_height and Pin_height <=3:
                 self.spring.set_profile(self.currentTrial[3], 'long')
@@ -531,7 +543,7 @@ class Experiment_Session:
             else:
                 self.write_info += str(8) + ','
             print "Actual FP: " + self.currentTrial[3] + " User FP: "  + self.User_feel_FP
-            print str(self.correct_times) + "/" + str(self.global_times_counter)
+            print "***" + str(self.correct_times) + "/" + str(self.global_times_counter)
 
             self.write_info += str(self.ask_last_num) + ","
             if self.currentTrial[1] == '1':
@@ -539,8 +551,10 @@ class Experiment_Session:
                 self.write_info += str(self.user_choice) + ","
                 if int(self.user_choice) == int(self.play_electronic_element.last_i_th(self.ask_last_num)):
                     self.write_info += str(1) + "\n"
+                    self.correct_RL_times += 1
                 else:
                     self.write_info += str(0) + "\n"
+                self.RL_total += 1
             else:
                 self.write_info += str(-1) + ","
                 self.write_info += str(self.user_choice) + ","
@@ -598,11 +612,13 @@ class Experiment_Session:
 
             self.PressSpaceTwice = False
             self.TrialInfo.set(self.show_info)
+            self.Position_Info.set(str(self.correct_RL_times) + "/" + str(self.RL_total))
             self.global_times_counter += 1
             self.show_info = ""
 
             # Create thread for handling haptic Spring
-            self.spring = Spring(self.Position_Info.set)
+            #self.spring = Spring(self.Position_Info.set)
+            self.spring = Spring()
             Pin_height = int(self.currentTrial[4])
             if 1 <= Pin_height and Pin_height <=3:
                 self.spring.set_profile(self.currentTrial[3], 'long')
@@ -713,12 +729,14 @@ class Experiment_Session:
 
         self.PressSpaceTwice = False
         self.TrialInfo.set(self.show_info)
+        self.Position_Info.set(str(self.correct_RL_times) + "/" + str(self.RL_total))
         self.show_info = ""
         self.global_times_counter += 1
         self.EnterPressTime += 1
 
         # Create thread for handling haptic Spring
-        self.spring = Spring(self.Position_Info.set)
+        #self.spring = Spring(self.Position_Info.set)
+        self.spring = Spring()
         Pin_height = int(self.currentTrial[4])
         if 1 <= Pin_height and Pin_height <= 3:
             self.spring.set_profile(self.currentTrial[3], 'long')

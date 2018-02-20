@@ -16,8 +16,7 @@ class Spring(threading.Thread):
         available_ports = list(list_ports.grep('/dev/tty', include_links=True))
         if not available_ports:
             raise ValueError("no available ports")
-        logging.info("available ports {}, choose port {}"
-                     .format([port.device for port in available_ports], available_ports[0].device))
+        print "available ports {}, choose port {}".format([port.device for port in available_ports], available_ports[0].device)
         self.ser = Serial(available_ports[0].device, baudrate=115200)
 
         self.callback = callback
@@ -101,10 +100,10 @@ class Spring(threading.Thread):
                                 x = int(round(self.x * 1000))
                                 logging.info("x = %s", x)
                                 self.writer.writerow([now, self.average_force, x_to_k, x, setpoint, proximity, k, output])
-                                if x != self.prev_x:
-                                    self.ser.write((str(x) + "s").encode())
-                                    logging.info("at %s, send x %d", now, x)
-                                    self.prev_x = x
+                                # if x != self.prev_x:
+                                self.ser.write((str(x) + "s").encode())
+                                logging.info("at %s, send x %d", now, x)
+                                self.prev_x = x
                             else:
                                 if abs(proximity - self.position) >= 5:
                                     x = self.position
@@ -132,12 +131,12 @@ class Spring(threading.Thread):
             self.k = k1
         elif profile == 'fixed':
             self.position = position
-        elif profile == 'linear':
-            self.left_point = left_point
-            self.right_point = right_point
-            self.rate = float(k2 - k1) / (right_point - left_point)
-            self.k1 = k1
-            self.k2 = k2
+        # elif profile == 'linear':
+        #     self.left_point = left_point
+        #     self.right_point = right_point
+        #     self.rate = float(k2 - k1) / (right_point - left_point)
+        #     self.k1 = k1
+        #     self.k2 = k2
         elif profile == "pseudo_click":
             self.k1 = k1
             self.k2 = k2
@@ -157,13 +156,13 @@ class Spring(threading.Thread):
         k = None
         if self.profile == 'constant':
             k = self.k
-        elif self.profile == 'linear':
-            if x < self.left_point:
-                k = self.k1
-            elif x < self.right_point:
-                k = self.rate * (x - self.left_point) + self.k1
-            else:
-                k = self.k2
+        # elif self.profile == 'linear':
+        #     if x < self.left_point:
+        #         k = self.k1
+        #     elif x < self.right_point:
+        #         k = self.rate * (x - self.left_point) + self.k1
+        #     else:
+        #         k = self.k2
         elif self.profile == "pseudo_click":
             if x < self.left_point:
                 k = self.k1
@@ -197,21 +196,21 @@ class Spring(threading.Thread):
             self._set_parameters("fixed", position=70)
         elif profile == "high":
             self._set_parameters("fixed", position=0)
-        elif profile == "increasing":
-            if length == "long" or length == "middle":
-                self._set_parameters("step", k1=5, k2=50, step_point=15)
-            elif length == "short":
-                self._set_parameters("step", k1=5, k2=50, step_point=15)
-        elif profile == "decreasing":
-            if length == "long":
-                self._set_parameters("linear", k1=50, k2=13, left_point=0, right_point=60)
-            elif length == "middle":
-                self._set_parameters("linear", k1=50, k2=13, left_point=0, right_point=30)
-            elif length == "short":
-                self._set_parameters("linear", k1=50, k2=20, left_point=0, right_point=15)
+        # elif profile == "increasing":
+        #     if length == "long" or length == "middle":
+        #         self._set_parameters("step", k1=5, k2=50, step_point=15)
+        #     elif length == "short":
+        #         self._set_parameters("step", k1=5, k2=50, step_point=15)
+        # elif profile == "decreasing":
+        #     if length == "long":
+        #         self._set_parameters("linear", k1=50, k2=13, left_point=0, right_point=60)
+        #     elif length == "middle":
+        #         self._set_parameters("linear", k1=50, k2=13, left_point=0, right_point=30)
+        #     elif length == "short":
+        #         self._set_parameters("linear", k1=50, k2=20, left_point=0, right_point=15)
         elif profile == "click":
             if length == "long":
-                self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=30, right_point=50, width=5)
+                self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=25, right_point=45, width=5)
             elif length == "middle":
                 self._set_parameters("pseudo_click", k1=5, k2=30, k3=5, left_point=20, right_point=40, width=5)
 
@@ -247,11 +246,11 @@ def main():
     # spring.set_profile("low", "short")
     # spring.set_profile("high", "short")
     # spring.set_profile("medium", "short")
-    # spring.set_profile("increasing", "short")
-    # spring.set_profile("decreasing", "short")
-    # spring.set_profile("click", "short")
-    # spring.set_profile("drop", "short")
-    spring.set_profile("empty")
+    spring.set_profile("increasing", "long")
+    # spring.set_profile("decreasing", "long")
+    # spring.set_profile("click", "long")
+    # spring.set_profile("drop", "long")
+    # spring.set_profile("empty")
     spring.start()
     try:
         while spring.is_alive:
