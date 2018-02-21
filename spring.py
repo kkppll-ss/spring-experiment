@@ -65,11 +65,11 @@ class Spring(threading.Thread):
         self.ode_solver.set_integrator("dopri5")
         self.ode_solver.set_initial_value([0, 0], 0)
 
-        self.state = "init"
+        self.state = None
     
     def should_stop(self, proximity):
         if self.profile != "empty" and self.profile != "high":
-            return (self.length == "long" and proximity > 100) or (self.length == "middle" and proximity > 60) or (self.profile == "short" and proximity > 30) or proximity < 3 and self.average_force < 0.01
+            return (self.length == "long" and proximity > 100) or (self.length == "middle" and proximity > 60) or (self.profile == "short" and proximity > 30) or (proximity < 3 and self.average_force < 0.01)
         elif self.profile == "high":
             return self.average_force < 0.01
         else:
@@ -92,6 +92,8 @@ class Spring(threading.Thread):
                             force_sensor, proximity = int(force_sensor), float(proximity)
                             setpoint, output = float(setpoint), float(output)
 
+                            empty_move = False
+
                             if self.last_time:
                                 delta_time = now - self.last_time
                                 self.estimated_delta_time = 0.8 * self.estimated_delta_time + 0.2 * delta_time
@@ -102,16 +104,31 @@ class Spring(threading.Thread):
                                 self.average_force = 0.9 * self.average_force + 0.1 * force
                             else:
                                 self.average_force = force
-                            if self.state == "init" and self.average_force > 0.01:
+                            if self.state is None and abs(self.average_force) < 0.01 and abs(proximity) < 5:
+                                self.state = "init"
+                                logging.info("proximity %0.3f, force %0.3f init", proximity, self.average_force)
+                                print "proximity %0.3f, force %0.3f init" % (proximity, self.average_force)
+                            elif self.state == "init" and self.average_force >= 0.03:
+                                empty_move = True
                                 if self.timer_starter:
                                     self.timer_starter()
                                 logging.info("proximity %0.3f, force %0.3f moving", proximity, self.average_force)
+                                print "proximity %0.3f, force %0.3f moving" % (proximity, self.average_force)
                                 self.state = "moving"
-                            elif self.state == "moving" and self.should_stop(proximity):
+                            elif self.state == "moving" and self.profile != "high" and proximity >= 15:
+                                logging.info("proximity %0.3f, force %0.3f moved", proximity, self.average_force)
+                                print "proximity %0.3f, force %0.3f moved" % (proximity, self.average_force)
+                                self.state = "moved"
+                            elif self.state == "moving" and self.profile == "high":
+                                logging.info("proximity %0.3f, force %0.3f moved", proximity, self.average_force)
+                                print "proximity %0.3f, force %0.3f moved" % (proximity, self.average_force)
+                                self.state = "moved"
+                            elif self.state == "moved" and self.should_stop(proximity):
                                 if self.sound_stopper:
                                     self.sound_stopper()
+                                self.state = "end"
+                                print "proximity %0.3f, force %0.3f stop" % (proximity, self.average_force)
                                 logging.info("proximity %0.3f, force %0.3f stop", proximity, self.average_force)
-                                self.state = "init"
                                 
                             logging.info("sensor: %d force: %0.2f average: %0.2f"
                                          , force_sensor, force, self.average_force)
@@ -132,7 +149,7 @@ class Spring(threading.Thread):
                                 self.writer.writerow([now, self.average_force, x, x, setpoint, proximity, 0, output])
                                 logging.info("at %s, send x %d", now, x)
                             else:
-                                if self.average_force >= 0.01 and abs(proximity) < 5:
+                                if empty_move:
                                     x = self.position
                                     self.ser.write((str(x) + "s").encode())
                                     self.writer.writerow([now, self.average_force, x, x, setpoint, proximity, 0, output])
@@ -147,6 +164,7 @@ class Spring(threading.Thread):
                         self.buffer = bytearray()
                 else:
                     self.buffer.extend(data)
+        self.ser.close()
 
     def _set_parameters(self, profile, k1=None, k2=None, k3=None,
                         left_point=None, right_point=None, step_point=None,
@@ -205,9 +223,9 @@ class Spring(threading.Thread):
             self._set_parameters("constant", k1=1)
         elif profile == "medium":
             if length == "short":
-                self._set_parameters("constant", k1=15)
+                self._set_parameters("constant", k1=40)
             else:
-                self._set_parameters("constant", k1=15)
+                self._set_parameters("constant", k1=25)
         elif profile == "empty":
             self._set_parameters("empty", position=80)
         elif profile == "high":
@@ -219,12 +237,12 @@ class Spring(threading.Thread):
                 self._set_parameters("pseudo_click", k1=1, k2=15, k3=1, left_point=20, right_point=40, width=0)
 
             elif length == "short":
-                self._set_parameters("pseudo_click", k1=1, k2=15, k3=1, left_point=10, right_point=20, width=0)
+                self._set_parameters("pseudo_click", k1=1, k2=25, k3=1, left_point=20, right_point=40, width=0)
         elif profile == "drop":
             if length != "short":
                 self._set_parameters("step", k1=80, k2=1, step_point=10)
             else:
-                self._set_parameters("step", k1=80, k2=1, step_point=5)
+                self._set_parameters("step", k1=80, k2=1, step_point=10)
 
         else:
             raise ValueError("unknown profile name '{}'".format(profile))
@@ -247,9 +265,9 @@ class Spring(threading.Thread):
 
 def main():
     spring = Spring()
-    spring.set_profile("low", "short")
-    # spring.set_profile("high", "short")
-    # spring.set_profile("medium", "short")
+    spring.set_profile("low", "long")
+    # spring.set_profile("high", "long")
+    # spring.set_profile("medium", "long")
     # spring.set_profile("click", "long")
     # spring.set_profile("drop", "long")
     # spring.set_profile("empty")

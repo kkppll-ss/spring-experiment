@@ -1,2 +1,7 @@
-User_num,User_name,User_age,User_gender,Trials,Recognition_Load,Handness,Force_Profile,Repeated_Times,Duration_Time,User_Choice,Haptic_Choice Correctness, ask_last_num,actual electronic element,user_RL_Choice,Recognition_Load_Correctness 
-2,343,1`43,1234,1,1,0,medium,RT03,4553,7,False,2,3,2,False
+User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Force_Profile,Component_Num,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,Recognition_Load_Correctness,space_sound_start,force_profile_start,sound_stop,space_curTrial_stop
+2,xsl,18,m,1,0,0,0,3,2274,0,1,-1,-1,-1-1,2018-02-20 18:09:25,-1,2018-02-20 18:09:27
+2,xsl,18,m,1,0,0,0,3,8769,0,1,-1,-1,-1-1,2018-02-20 18:13:45,-1,2018-02-20 18:13:53
+2,xsl,18,m,2,0,0,1,2,23898,1,1,-1,-1,-1-1,2018-02-20 18:14:02,-1,2018-02-20 18:14:26
+2,xsl,18,m,3,0,0,2,1,30655,2,1,-1,-1,-1-1,2018-02-20 18:14:43,-1,2018-02-20 18:15:14
+2,xsl,19,m,3,0,0,2,1,15614,2,1,-1,-1,-1-1,2018-02-20 18:16:20,-1,2018-02-20 18:16:36
+2,xsl,19,m,4,0,0,5,2,5564,5,1,-1,-1,-1-1,2018-02-20 18:17:46,-1,2018-02-20 18:17:51

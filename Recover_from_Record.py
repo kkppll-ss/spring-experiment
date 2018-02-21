@@ -18,14 +18,10 @@ def Recover_from_Record(filename=None):
         if read_counter == 0:
             read_counter += 1
         else:
-            if i[-5] == '1':
-                RL_correct += 1
-                RL_total += 1
-            elif i[-5] == '0':
-                RL_total += 1
-
+            if i[-5] != '0':
+                RL_correct += 1            
+            RL_total += 1
     return RL_correct, RL_total
-
 
 if __name__ == "__main__":
     print Recover_from_Record()

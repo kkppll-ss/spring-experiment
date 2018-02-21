@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 import time
+import datetime
 import Tkinter
 import tkMessageBox
 import Produce_Read_Order_list as Produce_Read_Order_List
@@ -335,26 +336,22 @@ class Experiment_Session:
 
             print "Space Entered"
             if self.SpacePressTime % 2 == 0:
+                self.Question_text.set("Sound START")
+                self.Question.place(x=7 * self.width / 16, y=3 * self.height / 4)
+                self.Question.config(fg="red", font=("Courier", 23, "bold"))
                 # Start to play sounds in recognition load
                 if self.currentTrial[1] == '1':
                     self.play_electronic_element = play_electronic_element()
                     self.play_electronic_element.start()
-                    self.space_sound_start = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                    self.space_sound_start = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f').split()[1]
                 else:
                     self.space_sound_start = "-1"
             else:
                 # Stop the movement of Haptic Spring
                 self.spring.terminate()
                 self.deltatime = int(round(time.time() * 1000)) - self.start
-                self.Question_text.set("Haptic Test END")
-                self.space_curTrial_stop = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-                self.Question.place(x=7 * self.width / 16, y=3 * self.height / 4)
-                self.Question.config(fg="red", font=("Courier", 23, "bold"))
-                self.Question.after(500, lambda: self.Question_text.set(""))
-
-                self.Question.after(500, lambda: self.Question_text.set("Select a Haptic Feel"))
-                self.Question.place(x= 5 * self.width / 16, y=3 * self.height / 4)
-                self.Question.config(font=("Courier", 23, "bold"), fg="blue")
+                self.Question_text.set("Haptic Test END, Select a Haptic Feel")
+                self.space_curTrial_stop = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f').split()[1]
                 self.PressSpaceTwice = True
             self.SpacePressTime += 1
 
@@ -440,7 +437,8 @@ class Experiment_Session:
                 # Show the recognition load question
                 if self.currentTrial[1] == '1':
                     self.ask_last_num = self.get_ask_last_num()
-                    self.Question_text.set("Select the Last " + str(self.ask_last_num) + " Electronic Element\n")
+                    self.Question_text.set("Select the Last " + str(self.ask_last_num) + " Chinese word\n")
+                    print "word_Pronounce: " + self.word_pron[self.play_electronic_element.last_i_th(self.ask_last_num)].decode("gbk")
                 else:
                     self.ask_last_num = -1
                     self.Question_text.set("No Question just Press [Enter] to Proceed")
@@ -488,7 +486,6 @@ class Experiment_Session:
 
             self.write_info += str(self.ask_last_num) + ","
             if self.currentTrial[1] == '1':
-                print "Word Pronounce: " + self.word_pron[self.play_electronic_element.last_i_th(self.ask_last_num)].decode("gbk")
                 self.write_info += str(self.user_choice) + ","
                 if self.user_choice == 1:
                     self.correct_RL_times += 1
@@ -594,7 +591,6 @@ class Experiment_Session:
         self.write_info += str(self.ask_last_num) + ","
         if self.currentTrial[1] == '1':
             self.write_info += str(self.play_electronic_element.last_i_th(self.ask_last_num)) + ","
-            print "word_Pronounce: " + self.word_pron[self.play_electronic_element.last_i_th(self.ask_last_num)].decode("gbk")
             self.write_info += str(self.user_choice) + ","
         else:
             self.write_info += str(-1) + ","
@@ -679,18 +675,26 @@ class Experiment_Session:
         return self.last_num.pop()
 
     def time_counter(self):
+
+        if self.SpacePressTime%2 != 1:
+            tkMessageBox.showinfo('Warning', message='Press [Space] before Force Profile Sense')
+            return
+
         self.start = int(round(time.time() * 1000))
         self.Question_text.set("Haptic Test START")
-        self.force_profile_start = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        self.force_profile_start = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f').split()[1]
         self.Question.place(x=6 * self.width / 16, y=3 * self.height / 4)
         self.Question.config(font=("Courier", 23, "bold"))
         self.Question.config(fg="green")
 
     def sound_stopper(self):
         # Stop play the sound of electronic element
+        self.Question_text.set("Sound END")
+        self.Question.place(x=7 * self.width / 16, y=3 * self.height / 4)
+        self.Question.config(fg="red", font=("Courier", 23, "bold"))
         if self.currentTrial[1] == '1':
             self.play_electronic_element.terminate()
-            self.sound_stop = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+            self.sound_stop = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f').split()[1]
         else:
             self.sound_stop = "-1"
 
