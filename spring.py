@@ -132,7 +132,18 @@ class Spring(threading.Thread):
                                 
                             logging.info("sensor: %d force: %0.2f average: %0.2f"
                                          , force_sensor, force, self.average_force)
-                            if self.profile != "empty" and self.profile != "high":
+                            if self.profile == "low" and self.length == "short":
+                                x = int(round(self.x * 1000))
+                                if self.average_force > 0.01 and x <= 10:
+                                    self.x += 0.001
+                                elif x >= 10 and self.average_force < 0.001:
+                                    self.x = 0
+                                x = int(round(self.x * 1000))
+                                self.writer.writerow([now, self.average_force, x, x, setpoint, proximity, 0, output])
+                                # if x != self.prev_x:
+                                self.ser.write((str(x) + "s").encode())
+                                logging.info("at %s, send x %d", now, x)
+                            elif self.profile != "empty" and self.profile != "high":
                                 x_to_k = int(round(self.x * 1000))
                                 k, damping = self._get_k(x_to_k)
                                 self._apply_f(self.average_force, k, damping)
@@ -173,7 +184,7 @@ class Spring(threading.Thread):
         self.ode_solver.set_initial_value([0, 0], 0)
         self.x = 0
 
-        if profile == "constant":
+        if profile == "low" or profile == "medium":
             self.k = k1
         elif profile == 'high' or profile == "empty":
             self.position = position
@@ -194,7 +205,7 @@ class Spring(threading.Thread):
 
     def _get_k(self, x):
         k = None
-        if self.profile == 'constant':
+        if self.profile == 'low' or self.profile == "medium":
             k = self.k
         elif self.profile == "pseudo_click":
             if x < self.left_point:
@@ -220,24 +231,24 @@ class Spring(threading.Thread):
         self.profile = profile
         self.length = length
         if profile == "low":
-            self._set_parameters("constant", k1=1)
+            self._set_parameters("low", k1=1)
         elif profile == "medium":
             if length == "short":
-                self._set_parameters("constant", k1=40)
+                self._set_parameters("medium", k1=40)
             else:
-                self._set_parameters("constant", k1=25)
+                self._set_parameters("medium", k1=25)
         elif profile == "empty":
             self._set_parameters("empty", position=80)
         elif profile == "high":
             self._set_parameters("high", position=0)
         elif profile == "click":
             if length == "long":
-                self._set_parameters("pseudo_click", k1=1, k2=15, k3=1, left_point=30, right_point=50, width=0)
+                self._set_parameters("pseudo_click", k1=5, k2=25, k3=5, left_point=30, right_point=50, width=0)
             elif length == "middle":
-                self._set_parameters("pseudo_click", k1=1, k2=15, k3=1, left_point=20, right_point=40, width=0)
+                self._set_parameters("pseudo_click", k1=5, k2=25, k3=5, left_point=20, right_point=40, width=0)
 
             elif length == "short":
-                self._set_parameters("pseudo_click", k1=1, k2=25, k3=1, left_point=20, right_point=40, width=0)
+                self._set_parameters("pseudo_click", k1=5, k2=40, k3=5, left_point=15, right_point=35, width=0)
         elif profile == "drop":
             if length != "short":
                 self._set_parameters("step", k1=80, k2=1, step_point=10)
@@ -265,11 +276,11 @@ class Spring(threading.Thread):
 
 def main():
     spring = Spring()
-    spring.set_profile("low", "long")
-    # spring.set_profile("high", "long")
-    # spring.set_profile("medium", "long")
-    # spring.set_profile("click", "long")
-    # spring.set_profile("drop", "long")
+    # spring.set_profile("low", "short")
+    # spring.set_profile("high", "short")
+    spring.set_profile("medium", "short")
+    # spring.set_profile("click", "short")
+    # spring.set_profile("drop", "short")
     # spring.set_profile("empty")
     spring.start()
     try:

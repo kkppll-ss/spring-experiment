@@ -11,6 +11,7 @@ from Tkinter import *
 import ImageTk
 import Image
 import random
+import os
 from spring import Spring
 
 
@@ -20,8 +21,8 @@ class Experiment_Session:
         # Set the basic params of windows
         self.root = Tkinter.Tk()
         self.root.title("Haptic Experiment")
-        w = 1920
-        h = 1080
+        w = self.root.winfo_screenwidth()
+        h = self.root.winfo_screenheight()
         self.width = w
         self.height = h
         self.root.geometry("%dx%d" % (w, h))
@@ -54,6 +55,7 @@ class Experiment_Session:
         self.deltatime = 0                  # The time duration for haptic sensing
         self.startTrialNum = 0              # Start number specified for program crash
         self.outputfile = None              # Output file for trial recording
+        self.outputfile_timeStamp = None    # Output file for timestamp
         self.currentTrial = None            # Current trial information
         self.play_electronic_element = None # Define the instance of electronic element sound play
         self.SpacePressTime = 0             # Times of press [Space]
@@ -84,7 +86,6 @@ class Experiment_Session:
         self.root.bind("<KeyPress>", self.SpaceContinue)            # Bind the [Space] press and its function
         self.root.focus_set()
         self.root.bind('<Return>', self.EnterPress)                  # Bind the [Enter] Key press
-        # self.spring = Spring()
 
         self.varNum = Tkinter.StringVar(value='')
         self.varName = Tkinter.StringVar(value='')
@@ -242,7 +243,6 @@ class Experiment_Session:
         self.word_pron = []
         for i in f_first:
             self.word_pron.append(i)
-        self.produce_random_list()
 
         self.root.mainloop()
 
@@ -274,19 +274,26 @@ class Experiment_Session:
 
             # check the existence of program crash
             if self.startTrialNum != 0:
-                existFilename = "Order_List/User_" + str(self.user_num) + "_order_list.txt"
+                existFilename = "User_Records/Participant"+str(self.user_num) + "/order_list.txt"
                 self.cmd.read_command(existFilename)            # Read commands => commands in existence file
-                self.correct_RL_times, self.RL_total = Recover_from_Record("Records/User_" + str(self.user_num) + "_record.txt")
+                self.correct_RL_times, self.RL_total = Recover_from_Record("User_Records/Participant"+str(self.user_num)+"/user_record.txt")
             else:
+                dir = os.getcwd()+"/User_Records/Participant"+str(self.user_num)
+                if not os.path.exists(dir):
+                    os.makedirs(dir)                   # make dirs
                 self.cmd.start_up(int(self.user_num))  # Produce commands by user number
                 self.cmd.read_command()           # Read commands => commands
                 # write the head information to the first line in the file
-                self.outputfile = open("Records/User_" + str(self.user_num) + "_record.txt", "w")
+                self.outputfile = open("User_Records/Participant"+str(self.user_num)+"/user_record.txt", "w")
+                self.outputfile_timeStamp = open("User_Records/Participant"+str(self.user_num)+"/user_timeStamp.txt", "w")
+                self.outputfile_timeStamp.write("space_sound_start,force_profile_start,sound_stop,space_curTrial_stop\n")
                 self.outputfile.write("User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Force_Profile,Component_Num,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,Recognition_Load_Correctness,space_sound_start,force_profile_start,sound_stop,space_curTrial_stop\n")
+                self.outputfile_timeStamp.close()
                 self.outputfile.close()
 
             # Re-open the output file again for later record useage
-            self.outputfile = open("Records/User_" + str(self.user_num) + "_record.txt", "a")
+            self.outputfile = open("User_Records/Participant"+str(self.user_num)+"/user_record.txt", "a")
+            self.outputfile_timeStamp = open("User_Records/Participant"+str(self.user_num)+"/user_timeStamp.txt", "a")
         else:
             tkMessageBox.showinfo('Error', message='Please enter an valid number[0-12]')
             return
@@ -436,7 +443,7 @@ class Experiment_Session:
 
                 # Show the recognition load question
                 if self.currentTrial[1] == '1':
-                    self.ask_last_num = self.get_ask_last_num()
+                    self.ask_last_num = int(self.currentTrial[-1])
                     self.Question_text.set("Select the Last " + str(self.ask_last_num) + " Chinese word\n")
                     print "word_Pronounce: " + self.word_pron[self.play_electronic_element.last_i_th(self.ask_last_num)].decode("gbk")
                 else:
@@ -486,18 +493,18 @@ class Experiment_Session:
 
             self.write_info += str(self.ask_last_num) + ","
             if self.currentTrial[1] == '1':
-                self.write_info += str(self.user_choice) + ","
+                self.write_info += str(self.user_choice) + "\n"
                 if self.user_choice == 1:
                     self.correct_RL_times += 1
                 self.RL_total += 1
             else:
                 self.write_info += str(-1) + ","
-                self.write_info += str(self.user_choice)
-            self.write_info += self.space_sound_start + ","
-            self.write_info += self.force_profile_start + ","
-            self.write_info += self.sound_stop + ","
-            self.write_info += self.space_curTrial_stop + "\n"
+                self.write_info += str(self.user_choice) + "\n"
+
+            timeStamp = self.space_sound_start+","+self.force_profile_start+","+self.sound_stop+","+self.space_curTrial_stop+"\n"
+            self.outputfile_timeStamp.write(timeStamp)
             self.outputfile.write(self.write_info)
+            self.outputfile_timeStamp.flush()
             self.outputfile.flush()
             self.write_info = ""
 
@@ -591,16 +598,15 @@ class Experiment_Session:
         self.write_info += str(self.ask_last_num) + ","
         if self.currentTrial[1] == '1':
             self.write_info += str(self.play_electronic_element.last_i_th(self.ask_last_num)) + ","
-            self.write_info += str(self.user_choice) + ","
+            self.write_info += str(self.user_choice) + "\n"
         else:
             self.write_info += str(-1) + ","
-            self.write_info += str(self.user_choice) + ","
+            self.write_info += str(self.user_choice) + "\n"
 
-        self.write_info += self.space_sound_start + ","
-        self.write_info += self.force_profile_start + ","
-        self.write_info += self.sound_stop + ","
-        self.write_info += self.space_curTrial_stop + "\n"
+        timeStamp = self.space_sound_start+","+self.force_profile_start+","+self.sound_stop+","+self.space_curTrial_stop+"\n"
+        self.outputfile_timeStamp.write(timeStamp)
         self.outputfile.write(self.write_info)
+        self.outputfile_timeStamp.flush()
         self.outputfile.flush()
         self.write_info = ""
 
@@ -656,23 +662,6 @@ class Experiment_Session:
         elif 7 <= Pin_height and Pin_height <= 9:
             self.spring.set_profile(self.currentTrial[2], 'short')
         self.spring.start()
-
-    # must be called at __init__
-    def produce_random_list(self):
-
-        for i in range(54):
-            self.last_num.append(1)
-
-        for i in range(27):
-            index = random.randrange(0, 54)
-            while self.last_num[index] != 1:
-                index = random.randrange(0, 54)
-                pass
-            self.last_num[index] = 2
-
-    # Each time when recognition load ask question
-    def get_ask_last_num(self):
-        return self.last_num.pop()
 
     def time_counter(self):
 

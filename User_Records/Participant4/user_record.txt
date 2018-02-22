@@ -1,0 +1,5 @@
+User_num,User_name,User_age,User_gender,Trials,Pin_height,Recognition_Load,Force_Profile,Component_Num,Duration_Time,User_Choice,Haptic_Choice_Correctness, ask_last_num,Recognition_Load_Correctness,space_sound_start,force_profile_start,sound_stop,space_curTrial_stop
+4,wyk,21,male,1,0,0,0,1,1519276903999,2,0,-1,-1,-1
+4,wyk,16,male,19,0,1,4,1,2503,2,0,1,1
+4,wyk,16,male,20,0,1,0,3,2464,0,1,2,1
+4,wyk,16,male,21,0,1,3,3,3812,3,1,2,1
